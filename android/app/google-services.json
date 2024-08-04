@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "721684596657",
+    "firebase_url": "https://ncrsabjiwala-e782c-default-rtdb.firebaseio.com",
+    "project_id": "ncrsabjiwala-e782c",
+    "storage_bucket": "ncrsabjiwala-e782c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721684596657:android:55f8810549f4cdf41f9f90",
+        "android_client_info": {
+          "package_name": "com.ncrsabjiwala.customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbL8bgFv_qwi5IQslSOFCR3B2VYB6TY88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
