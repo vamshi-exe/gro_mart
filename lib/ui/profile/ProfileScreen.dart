@@ -46,16 +46,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Stack(
               alignment: Alignment.bottomCenter,
               children: <Widget>[
-                Center(child: displayCircleImage(user.profilePictureURL, 130, false)),
+                Center(
+                    child:
+                        displayCircleImage(user.profilePictureURL, 130, false)),
                 Positioned(
                   right: 100,
                   child: FloatingActionButton(
                       backgroundColor: Color(COLOR_ACCENT),
                       child: Icon(
                         Icons.camera_alt,
-                        color: isDarkMode(context) ? Colors.black : Colors.white,
+                        color:
+                            isDarkMode(context) ? Colors.black : Colors.white,
                       ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
                       mini: true,
                       onPressed: _onCameraClick),
                 )
@@ -66,7 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.only(top: 16.0, right: 32, left: 32),
             child: Text(
               user.fullName(),
-              style: TextStyle(color: isDarkMode(context) ? Colors.white : Colors.black, fontSize: 20),
+              style: TextStyle(
+                  color: isDarkMode(context) ? Colors.white : Colors.black,
+                  fontSize: 20),
               textAlign: TextAlign.center,
             ),
           ),
@@ -119,7 +125,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ListTile(
                   onTap: () async {
                     AuthProviders? authProvider;
-                    List<auth.UserInfo> userInfoList = auth.FirebaseAuth.instance.currentUser?.providerData ?? [];
+                    List<auth.UserInfo> userInfoList =
+                        auth.FirebaseAuth.instance.currentUser?.providerData ??
+                            [];
                     await Future.forEach(userInfoList, (auth.UserInfo info) {
                       switch (info.providerId) {
                         case 'password':
@@ -141,12 +149,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       builder: (context) => ReAuthUserScreen(
                         provider: authProvider!,
                         email: auth.FirebaseAuth.instance.currentUser!.email,
-                        phoneNumber: auth.FirebaseAuth.instance.currentUser!.phoneNumber,
+                        phoneNumber:
+                            auth.FirebaseAuth.instance.currentUser!.phoneNumber,
                         deleteUser: true,
                       ),
                     );
                     if (result != null && result) {
-                      await showProgress(context, "Deleting account...".tr(), false);
+                      await showProgress(
+                          context, "Deleting account...".tr(), false);
                       await FireStoreUtils.deleteUser();
                       await hideProgress();
                       MyAppState.currentUser = null;
@@ -173,11 +183,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   padding: EdgeInsets.only(top: 12, bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0), side: BorderSide(color: isDarkMode(context) ? Colors.grey.shade700 : Colors.grey.shade200)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      side: BorderSide(
+                          color: isDarkMode(context)
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade200)),
                 ),
                 child: Text(
                   'Log Out',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode(context) ? Colors.white : Colors.black),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode(context) ? Colors.white : Colors.black),
                 ).tr(),
                 onPressed: () async {
                   //user.active = false;
@@ -219,7 +237,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text("Choose from gallery").tr(),
           onPressed: () async {
             Navigator.pop(context);
-            XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+            XFile? image =
+                await _imagePicker.pickImage(source: ImageSource.gallery);
             if (image != null) {
               await _imagePicked(File(image.path));
             }
@@ -230,7 +249,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text("Take a picture").tr(),
           onPressed: () async {
             Navigator.pop(context);
-            XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+            XFile? image =
+                await _imagePicker.pickImage(source: ImageSource.camera);
             if (image != null) {
               await _imagePicked(File(image.path));
             }
@@ -257,10 +277,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (mb > 2) {
       hideProgress();
-      showAlertDialog(context, "error".tr(), "Select an image that is less than 2MB".tr(), true);
+      showAlertDialog(context, "error".tr(),
+          "Select an image that is less than 2MB".tr(), true);
       return;
     }
-    user.profilePictureURL = await FireStoreUtils.uploadUserImageToFireStorage(compressedImage, user.userID);
+    user.profilePictureURL = await FireStoreUtils.uploadUserImageToFireStorage(
+        compressedImage, user.userID);
     await FireStoreUtils.updateCurrentUser(user);
     MyAppState.currentUser = user;
     hideProgress();

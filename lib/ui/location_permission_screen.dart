@@ -8,6 +8,7 @@ import 'package:gromart_customer/model/AddressModel.dart';
 import 'package:gromart_customer/model/User.dart';
 import 'package:gromart_customer/services/helper.dart';
 import 'package:gromart_customer/ui/container/ContainerScreen.dart';
+import 'package:gromart_customer/ui/navigation/navigation.dart';
 import 'package:gromart_customer/widget/permission_dialog.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,7 +21,8 @@ class LocationPermissionScreen extends StatefulWidget {
   const LocationPermissionScreen({Key? key}) : super(key: key);
 
   @override
-  _LocationPermissionScreenState createState() => _LocationPermissionScreenState();
+  _LocationPermissionScreenState createState() =>
+      _LocationPermissionScreenState();
 }
 
 class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
@@ -36,11 +38,15 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
             child: Image.asset("assets/images/location_screen.png"),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 16, top: 32, right: 16, bottom: 8),
+            padding:
+                const EdgeInsets.only(left: 16, top: 32, right: 16, bottom: 8),
             child: Text(
               "Find restaurant and food near you",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(COLOR_PRIMARY), fontSize: 22.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Color(COLOR_PRIMARY),
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold),
             ).tr(),
           ),
           Padding(
@@ -68,7 +74,10 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                 ),
                 child: Text(
                   "Use current location",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ).tr(),
                 onPressed: () {
                   checkPermission(
@@ -77,13 +86,19 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                       AddressModel addressModel = AddressModel();
                       try {
                         await Geolocator.requestPermission();
-                        Position newLocalData = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+                        Position newLocalData =
+                            await Geolocator.getCurrentPosition(
+                                desiredAccuracy: LocationAccuracy.high);
 
-                        await placemarkFromCoordinates(newLocalData.latitude, newLocalData.longitude).then((valuePlaceMaker) {
+                        await placemarkFromCoordinates(
+                                newLocalData.latitude, newLocalData.longitude)
+                            .then((valuePlaceMaker) {
                           Placemark placeMark = valuePlaceMaker[0];
 
                           setState(() {
-                            addressModel.location = UserLocation(latitude: newLocalData.latitude, longitude: newLocalData.longitude);
+                            addressModel.location = UserLocation(
+                                latitude: newLocalData.latitude,
+                                longitude: newLocalData.longitude);
                             String currentLocation =
                                 "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
                             addressModel.locality = currentLocation;
@@ -93,12 +108,19 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
 
                         MyAppState.selectedPosotion = addressModel;
                         await hideProgress();
-                        pushAndRemoveUntil(context, ContainerScreen(user: MyAppState.currentUser), false);
+                        // pushAndRemoveUntil(
+                        //     context,
+                        //     ContainerScreen(user: MyAppState.currentUser),
+                        //     false);
+                        pushAndRemoveUntil(context,
+                            Navigation(user: MyAppState.currentUser!), false);
                       } catch (e) {
-                        await placemarkFromCoordinates(19.228825, 72.854118).then((valuePlaceMaker) {
+                        await placemarkFromCoordinates(19.228825, 72.854118)
+                            .then((valuePlaceMaker) {
                           Placemark placeMark = valuePlaceMaker[0];
                           setState(() {
-                            addressModel.location = UserLocation(latitude: 19.228825, longitude: 72.854118);
+                            addressModel.location = UserLocation(
+                                latitude: 19.228825, longitude: 72.854118);
                             String currentLocation =
                                 "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
                             addressModel.locality = currentLocation;
@@ -107,7 +129,9 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
 
                         MyAppState.selectedPosotion = addressModel;
                         await hideProgress();
-                        pushAndRemoveUntil(context, ContainerScreen(user:  MyAppState.currentUser), false);
+                        pushAndRemoveUntil(context,
+                            Navigation(user: MyAppState.currentUser!), false);
+                        // pushAndRemoveUntil(context, ContainerScreen(user:  MyAppState.currentUser), false);
                       }
                     },
                   );
@@ -132,17 +156,20 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                 ),
                 child: Text(
                   "Set from map",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ).tr(),
                 onPressed: () async {
-
                   checkPermission(
-                        () async {
+                    () async {
                       await showProgress(context, "Please wait...".tr(), false);
                       AddressModel addressModel = AddressModel();
                       try {
                         await Geolocator.requestPermission();
-                        await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+                        await Geolocator.getCurrentPosition(
+                            desiredAccuracy: LocationAccuracy.high);
                         await hideProgress();
                         Navigator.push(
                           context,
@@ -150,12 +177,24 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                             builder: (context) => PlacePicker(
                               apiKey: GOOGLE_API_KEY,
                               onPlacePicked: (result) {
-                                addressModel.locality = result.formattedAddress!.toString();
-                                addressModel.location = UserLocation(latitude: result.geometry!.location.lat, longitude: result.geometry!.location.lng);
+                                addressModel.locality =
+                                    result.formattedAddress!.toString();
+                                addressModel.location = UserLocation(
+                                    latitude: result.geometry!.location.lat,
+                                    longitude: result.geometry!.location.lng);
                                 log(result.toString());
                                 MyAppState.selectedPosotion = addressModel;
                                 setState(() {});
-                                pushAndRemoveUntil(context, ContainerScreen(user:  MyAppState.currentUser), false);
+                                // pushAndRemoveUntil(
+                                //     context,
+                                //     ContainerScreen(
+                                //         user: MyAppState.currentUser),
+                                //     false);
+
+                                pushAndRemoveUntil(
+                                    context,
+                                    Navigation(user: MyAppState.currentUser!),
+                                    false);
                               },
                               initialPosition: LatLng(-33.8567844, 151.213108),
                               useCurrentLocation: true,
@@ -164,15 +203,18 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                               usePlaceDetailSearch: true,
                               zoomGesturesEnabled: true,
                               zoomControlsEnabled: true,
-                              resizeToAvoidBottomInset: false, // only works in page mode, less flickery, remove if wrong offsets
+                              resizeToAvoidBottomInset:
+                                  false, // only works in page mode, less flickery, remove if wrong offsets
                             ),
                           ),
                         );
                       } catch (e) {
-                        await placemarkFromCoordinates(19.228825, 72.854118).then((valuePlaceMaker) {
+                        await placemarkFromCoordinates(19.228825, 72.854118)
+                            .then((valuePlaceMaker) {
                           Placemark placeMark = valuePlaceMaker[0];
                           setState(() {
-                            addressModel.location = UserLocation(latitude: 19.228825, longitude: 72.854118);
+                            addressModel.location = UserLocation(
+                                latitude: 19.228825, longitude: 72.854118);
                             String currentLocation =
                                 "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
                             addressModel.locality = currentLocation;
@@ -181,7 +223,12 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
 
                         MyAppState.selectedPosotion = addressModel;
                         await hideProgress();
-                        pushAndRemoveUntil(context, ContainerScreen(user:  MyAppState.currentUser), false);
+                        // pushAndRemoveUntil(
+                        //     context,
+                        //     ContainerScreen(user: MyAppState.currentUser),
+                        //     false);
+                        pushAndRemoveUntil(context,
+                            Navigation(user: MyAppState.currentUser!), false);
                       }
                     },
                   );
@@ -191,20 +238,36 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
           ),
           MyAppState.currentUser != null
               ? Padding(
-                  padding: const EdgeInsets.only(right: 40.0, left: 40.0, top: 10),
+                  padding:
+                      const EdgeInsets.only(right: 40.0, left: 40.0, top: 10),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(minWidth: double.infinity),
+                    constraints:
+                        const BoxConstraints(minWidth: double.infinity),
                     child: TextButton(
                       child: Text(
                         "Enter Manually location",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(COLOR_PRIMARY)),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(COLOR_PRIMARY)),
                       ).tr(),
                       onPressed: () async {
-                        await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeliveryAddressScreen())).then((value) {
+                        await Navigator.of(context)
+                            .push(MaterialPageRoute(
+                                builder: (context) => DeliveryAddressScreen()))
+                            .then((value) {
                           if (value != null) {
                             AddressModel addressModel = value;
                             MyAppState.selectedPosotion = addressModel;
-                            pushAndRemoveUntil(context, ContainerScreen(user: MyAppState.currentUser), false);
+                            // pushAndRemoveUntil(
+                            //     context,
+                            //     ContainerScreen(user: MyAppState.currentUser),
+                            //     false);
+
+                            pushAndRemoveUntil(
+                                context,
+                                Navigation(user: MyAppState.currentUser!),
+                                false);
                           }
                         });
                       },

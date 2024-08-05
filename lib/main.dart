@@ -15,6 +15,7 @@ import 'package:gromart_customer/model/AddressModel.dart';
 import 'package:gromart_customer/model/CurrencyModel.dart';
 import 'package:gromart_customer/model/mail_setting.dart';
 import 'package:gromart_customer/services/FirebaseHelper.dart';
+import 'package:gromart_customer/services/appRepo.dart';
 import 'package:gromart_customer/services/helper.dart';
 import 'package:gromart_customer/services/localDatabase.dart';
 import 'package:gromart_customer/ui/auth/AuthScreen.dart';
@@ -63,7 +64,10 @@ void main() async {
       providers: [
         Provider<CartDatabase>(
           create: (_) => CartDatabase(),
-        )
+        ),
+        Provider<AppRepo>(
+          create: (_) => AppRepo(),
+        ),
       ],
       child: EasyLocalization(
         supportedLocales: [Locale('en'), Locale('ar')],

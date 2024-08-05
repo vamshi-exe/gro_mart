@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gromart_customer/ui/location_permission_screen.dart';
+import 'package:gromart_customer/ui/navigation/navigation.dart';
 import 'package:gromart_customer/ui/signUp/SignUpScreen.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart' as apple;
 import 'package:gromart_customer/constants.dart';
@@ -469,7 +470,13 @@ class _LoginScreen extends State<LoginScreen> {
               MyAppState.selectedPosotion =
                   MyAppState.currentUser!.shippingAddress!.first;
             }
-            pushAndRemoveUntil(context, ContainerScreen(user: result), false);
+            pushAndRemoveUntil(
+                context,
+                Navigation(
+                  user: result,
+                ),
+                false);
+            // pushAndRemoveUntil(context, ContainerScreen(user: result), false);
           } else {
             pushAndRemoveUntil(context, LocationPermissionScreen(), false);
           }

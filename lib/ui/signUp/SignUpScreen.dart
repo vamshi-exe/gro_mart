@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart' as easyLocal;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gromart_customer/constants.dart';
 import 'package:gromart_customer/main.dart';
@@ -18,6 +17,7 @@ import 'package:gromart_customer/ui/phoneAuth/PhoneNumberInputScreen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pinput.dart';
+import 'package:smart_auth/smart_auth.dart';
 
 File? _image;
 
@@ -26,7 +26,9 @@ class SignUpScreen extends StatefulWidget {
   State createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUpScreen> {
+class _SignUpState extends State<SignUpScreen> with TickerProviderStateMixin {
+  late final SmsRetriever smsRetriever;
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   TextEditingController emailController = TextEditingController();
@@ -45,6 +47,11 @@ class _SignUpState extends State<SignUpScreen> {
   bool showVerifyEmailPopup = false;
   bool showEnterOTPPopup = false;
   bool showSuccessPopup = false;
+  AnimationController? controller;
+
+  Duration get duration => controller!.duration! * controller!.value;
+
+  bool get expired => duration.inSeconds == 0;
 
   void toggleVerifyEmailPopup() {
     setState(() {
@@ -62,6 +69,22 @@ class _SignUpState extends State<SignUpScreen> {
     setState(() {
       showSuccessPopup = !showSuccessPopup;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // formKey = GlobalKey<FormState>();
+    // pinController = TextEditingController();
+    // focusNode = FocusNode();
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 30),
+    );
+
+    smsRetriever = SmsRetrieverImpl(
+      SmartAuth(),
+    );
   }
 
   @override
@@ -178,7 +201,7 @@ class _SignUpState extends State<SignUpScreen> {
               ),
               Center(
                 child: Container(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.only(left: 12.0, right: 12),
                   margin: const EdgeInsets.symmetric(horizontal: 24.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -189,10 +212,10 @@ class _SignUpState extends State<SignUpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Enter OTP',
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -204,15 +227,18 @@ class _SignUpState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 24),
                       Pinput(
+                        smsRetriever: smsRetriever,
                         length: 4,
                         showCursor: true,
                         onCompleted: (pin) => print(pin),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           toggleEnterOTPPopup();
                           toggleSuccessPopup();
+                          // _signUp();
+                          await _signUpWithEmailAndPassword();
                         },
                         child: const Text('Verify'),
                         style: ElevatedButton.styleFrom(
@@ -764,27 +790,29 @@ class _SignUpState extends State<SignUpScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(minWidth: double.infinity),
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.only(top: 12, bottom: 12),
-                  backgroundColor: Color(COLOR_ACCENT),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    side: BorderSide(
-                      color: Color(COLOR_ACCENT),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.only(top: 12, bottom: 12),
+                    backgroundColor: Color(COLOR_ACCENT),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      side: BorderSide(
+                        color: Color(COLOR_ACCENT),
+                      ),
                     ),
                   ),
-                ),
-                child: Text(
-                  'Sign Up'.tr(),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode(context) ? Colors.black : Colors.white,
+                  child: Text(
+                    'Sign Up'.tr(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode(context) ? Colors.black : Colors.white,
+                    ),
                   ),
-                ),
-                // onPressed: () {},
-                onPressed: toggleVerifyEmailPopup,
-              ),
+                  // onPressed: toggleVerifyEmailPopup
+
+                  onPressed: () => _signUp()
+                  // toggleVerifyEmailPopup,
+                  ),
             ),
           ),
           SizedBox(
@@ -860,6 +888,7 @@ class _SignUpState extends State<SignUpScreen> {
   _signUp() async {
     if (_key.currentState?.validate() ?? false) {
       _key.currentState!.save();
+      toggleVerifyEmailPopup();
       // if (referralCode.toString().isNotEmpty) {
       //   FireStoreUtils.checkReferralCodeValidOrNot(referralCode.toString())
       //       .then((value) async {
@@ -878,7 +907,7 @@ class _SignUpState extends State<SignUpScreen> {
       //     }
       //   });
       // } else {
-      await _signUpWithEmailAndPassword();
+      // await _signUpWithEmailAndPassword();
       // }
     } else {
       setState(() {
@@ -924,4 +953,31 @@ class _SignUpState extends State<SignUpScreen> {
       showAlertDialog(context, 'failed'.tr(), "Couldn't sign up".tr(), true);
     }
   }
+}
+
+class SmsRetrieverImpl implements SmsRetriever {
+  const SmsRetrieverImpl(this.smartAuth);
+
+  final SmartAuth smartAuth;
+
+  @override
+  Future<void> dispose() {
+    return smartAuth.removeSmsListener();
+  }
+
+  @override
+  Future<String?> getSmsCode() async {
+    final signature = await smartAuth.getAppSignature();
+    debugPrint('App Signature: $signature');
+    final res = await smartAuth.getSmsCode(
+      useUserConsentApi: true,
+    );
+    if (res.succeed && res.codeFound) {
+      return res.code!;
+    }
+    return null;
+  }
+
+  @override
+  bool get listenForMultipleSms => false;
 }
