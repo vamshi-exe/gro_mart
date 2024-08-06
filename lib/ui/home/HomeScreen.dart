@@ -139,294 +139,300 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          backgroundColor: isDarkMode(context)
-              ? const Color(DARK_BG_COLOR)
-              : const Color(0xffFFFFFF),
-          body: isLoading == true
-              ? Center(child: CircularProgressIndicator())
-              : (MyAppState.selectedPosotion.location!.latitude == 0 &&
-                      MyAppState.selectedPosotion.location!.longitude == 0)
-                  ? Center(
-                      child: showEmptyState(
-                          "We don't have your location.".tr(), context,
-                          description:
-                              "Set your location to started searching for stores in your area"
-                                  .tr(), action: () async {
-                        checkPermission(
-                          () async {
-                            await showProgress(
-                                context, "Please wait...".tr(), false);
-                            AddressModel addressModel = AddressModel();
-                            try {
-                              await Geolocator.requestPermission();
-                              await Geolocator.getCurrentPosition();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PlacePicker(
-                                    apiKey: GOOGLE_API_KEY,
-                                    onPlacePicked: (result) async {
-                                      await hideProgress();
-                                      AddressModel addressModel =
-                                          AddressModel();
-                                      addressModel.locality =
-                                          result.formattedAddress!.toString();
-                                      addressModel.location = UserLocation(
-                                          latitude:
-                                              result.geometry!.location.lat,
-                                          longitude:
-                                              result.geometry!.location.lng);
-                                      MyAppState.selectedPosotion =
-                                          addressModel;
-                                      setState(() {});
-                                      getData();
-                                      Navigator.of(context).pop();
-                                    },
-                                    initialPosition:
-                                        LatLng(-33.8567844, 151.213108),
-                                    useCurrentLocation: true,
-                                    selectInitialPosition: true,
-                                    usePinPointingSearch: true,
-                                    usePlaceDetailSearch: true,
-                                    zoomGesturesEnabled: true,
-                                    zoomControlsEnabled: true,
-                                    resizeToAvoidBottomInset:
-                                        false, // only works in page mode, less flickery, remove if wrong offsets
-                                  ),
+        backgroundColor: isDarkMode(context)
+            ? const Color(DARK_BG_COLOR)
+            : const Color(0xffFFFFFF),
+        body: isLoading == true
+            ? Center(child: CircularProgressIndicator())
+            : (MyAppState.selectedPosotion.location!.latitude == 0 &&
+                    MyAppState.selectedPosotion.location!.longitude == 0)
+                ? Center(
+                    child: showEmptyState(
+                        "We don't have your location.".tr(), context,
+                        description:
+                            "Set your location to started searching for stores in your area"
+                                .tr(), action: () async {
+                      checkPermission(
+                        () async {
+                          await showProgress(
+                              context, "Please wait...".tr(), false);
+                          AddressModel addressModel = AddressModel();
+                          try {
+                            await Geolocator.requestPermission();
+                            await Geolocator.getCurrentPosition();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlacePicker(
+                                  apiKey: GOOGLE_API_KEY,
+                                  onPlacePicked: (result) async {
+                                    await hideProgress();
+                                    AddressModel addressModel = AddressModel();
+                                    addressModel.locality =
+                                        result.formattedAddress!.toString();
+                                    addressModel.location = UserLocation(
+                                        latitude: result.geometry!.location.lat,
+                                        longitude:
+                                            result.geometry!.location.lng);
+                                    MyAppState.selectedPosotion = addressModel;
+                                    setState(() {});
+                                    getData();
+                                    Navigator.of(context).pop();
+                                  },
+                                  initialPosition:
+                                      LatLng(-33.8567844, 151.213108),
+                                  useCurrentLocation: true,
+                                  selectInitialPosition: true,
+                                  usePinPointingSearch: true,
+                                  usePlaceDetailSearch: true,
+                                  zoomGesturesEnabled: true,
+                                  zoomControlsEnabled: true,
+                                  resizeToAvoidBottomInset:
+                                      false, // only works in page mode, less flickery, remove if wrong offsets
                                 ),
-                              );
-                            } catch (e) {
-                              await placemarkFromCoordinates(
-                                      19.228825, 72.854118)
-                                  .then((valuePlaceMaker) {
-                                Placemark placeMark = valuePlaceMaker[0];
-                                setState(() {
-                                  addressModel.location = UserLocation(
-                                      latitude: 19.228825,
-                                      longitude: 72.854118);
-                                  String currentLocation =
-                                      "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
-                                  addressModel.locality = currentLocation;
-                                });
+                              ),
+                            );
+                          } catch (e) {
+                            await placemarkFromCoordinates(19.228825, 72.854118)
+                                .then((valuePlaceMaker) {
+                              Placemark placeMark = valuePlaceMaker[0];
+                              setState(() {
+                                addressModel.location = UserLocation(
+                                    latitude: 19.228825, longitude: 72.854118);
+                                String currentLocation =
+                                    "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
+                                addressModel.locality = currentLocation;
                               });
+                            });
 
-                              MyAppState.selectedPosotion = addressModel;
-                              await hideProgress();
-                              getData();
-                            }
-                          },
-                        );
-                      }, buttonTitle: 'Select'.tr()),
-                    )
-                  : SafeArea(
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            color: isDarkMode(context)
-                                ? const Color(DARK_COLOR)
-                                : const Color(0xffFFFFFF),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(bottom: 10, top: 8),
-                                  child: Container(
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 12),
-                                            child: Container(
-                                              padding: EdgeInsets.zero,
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.location_on_outlined,
-                                                    color: AppColors.MAIN_GREEN,
-                                                    size: 24,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () async {
-                                                            if (MyAppState
-                                                                    .currentUser !=
-                                                                null) {
-                                                              await Navigator.of(
-                                                                      context)
-                                                                  .push(MaterialPageRoute(
+                            MyAppState.selectedPosotion = addressModel;
+                            await hideProgress();
+                            getData();
+                          }
+                        },
+                      );
+                    }, buttonTitle: 'Select'.tr()),
+                  )
+                : SafeArea(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          color: isDarkMode(context)
+                              ? const Color(DARK_COLOR)
+                              : const Color(0xffFFFFFF),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(bottom: 10, top: 8),
+                                child: Container(
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                            left: 10,
+                                            right: 10,
+                                          ),
+                                          child: Container(
+                                            padding: EdgeInsets.zero,
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.location_on_outlined,
+                                                  color: AppColors.MAIN_GREEN,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () async {
+                                                          if (MyAppState
+                                                                  .currentUser !=
+                                                              null) {
+                                                            await Navigator.of(
+                                                                    context)
+                                                                .push(MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            DeliveryAddressScreen()))
+                                                                .then((value) {
+                                                              if (value !=
+                                                                  null) {
+                                                                AddressModel
+                                                                    addressModel =
+                                                                    value;
+                                                                MyAppState
+                                                                        .selectedPosotion =
+                                                                    addressModel;
+                                                                setState(() {});
+                                                                getData();
+                                                              }
+                                                            });
+                                                          } else {
+                                                            checkPermission(
+                                                              () async {
+                                                                await showProgress(
+                                                                    context,
+                                                                    "Please wait..."
+                                                                        .tr(),
+                                                                    true);
+                                                                AddressModel
+                                                                    addressModel =
+                                                                    AddressModel();
+                                                                try {
+                                                                  await Geolocator
+                                                                      .requestPermission();
+                                                                  await Geolocator
+                                                                      .getCurrentPosition();
+                                                                  await hideProgress();
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
                                                                       builder:
                                                                           (context) =>
-                                                                              DeliveryAddressScreen()))
-                                                                  .then(
-                                                                      (value) {
-                                                                if (value !=
-                                                                    null) {
-                                                                  AddressModel
-                                                                      addressModel =
-                                                                      value;
+                                                                              PlacePicker(
+                                                                        apiKey:
+                                                                            GOOGLE_API_KEY,
+                                                                        onPlacePicked:
+                                                                            (result) async {
+                                                                          print(
+                                                                              "-========>");
+                                                                          print(
+                                                                              result);
+                                                                          await hideProgress();
+                                                                          AddressModel
+                                                                              addressModel =
+                                                                              AddressModel();
+                                                                          addressModel.locality = result
+                                                                              .formattedAddress!
+                                                                              .toString();
+                                                                          addressModel.location = UserLocation(
+                                                                              latitude: result.geometry!.location.lat,
+                                                                              longitude: result.geometry!.location.lng);
+                                                                          MyAppState.selectedPosotion =
+                                                                              addressModel;
+                                                                          setState(
+                                                                              () {});
+                                                                          getData();
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        },
+                                                                        initialPosition: LatLng(
+                                                                            -33.8567844,
+                                                                            151.213108),
+                                                                        useCurrentLocation:
+                                                                            true,
+                                                                        selectInitialPosition:
+                                                                            true,
+                                                                        usePinPointingSearch:
+                                                                            true,
+                                                                        usePlaceDetailSearch:
+                                                                            true,
+                                                                        zoomGesturesEnabled:
+                                                                            true,
+                                                                        zoomControlsEnabled:
+                                                                            true,
+                                                                        resizeToAvoidBottomInset:
+                                                                            false, // only works in page mode, less flickery, remove if wrong offsets
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                } catch (e) {
+                                                                  await placemarkFromCoordinates(
+                                                                          19.228825,
+                                                                          72.854118)
+                                                                      .then(
+                                                                          (valuePlaceMaker) {
+                                                                    Placemark
+                                                                        placeMark =
+                                                                        valuePlaceMaker[
+                                                                            0];
+                                                                    setState(
+                                                                        () {
+                                                                      addressModel.location = UserLocation(
+                                                                          latitude:
+                                                                              19.228825,
+                                                                          longitude:
+                                                                              72.854118);
+                                                                      String
+                                                                          currentLocation =
+                                                                          "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
+                                                                      addressModel
+                                                                              .locality =
+                                                                          currentLocation;
+                                                                    });
+                                                                  });
+
                                                                   MyAppState
                                                                           .selectedPosotion =
                                                                       addressModel;
-                                                                  setState(
-                                                                      () {});
+                                                                  await hideProgress();
                                                                   getData();
                                                                 }
-                                                              });
-                                                            } else {
-                                                              checkPermission(
-                                                                () async {
-                                                                  await showProgress(
-                                                                      context,
-                                                                      "Please wait..."
-                                                                          .tr(),
-                                                                      true);
-                                                                  AddressModel
-                                                                      addressModel =
-                                                                      AddressModel();
-                                                                  try {
-                                                                    await Geolocator
-                                                                        .requestPermission();
-                                                                    await Geolocator
-                                                                        .getCurrentPosition();
-                                                                    await hideProgress();
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                PlacePicker(
-                                                                          apiKey:
-                                                                              GOOGLE_API_KEY,
-                                                                          onPlacePicked:
-                                                                              (result) async {
-                                                                            print("-========>");
-                                                                            print(result);
-                                                                            await hideProgress();
-                                                                            AddressModel
-                                                                                addressModel =
-                                                                                AddressModel();
-                                                                            addressModel.locality =
-                                                                                result.formattedAddress!.toString();
-                                                                            addressModel.location =
-                                                                                UserLocation(latitude: result.geometry!.location.lat, longitude: result.geometry!.location.lng);
-                                                                            MyAppState.selectedPosotion =
-                                                                                addressModel;
-                                                                            setState(() {});
-                                                                            getData();
-                                                                            Navigator.of(context).pop();
-                                                                          },
-                                                                          initialPosition: LatLng(
-                                                                              -33.8567844,
-                                                                              151.213108),
-                                                                          useCurrentLocation:
-                                                                              true,
-                                                                          selectInitialPosition:
-                                                                              true,
-                                                                          usePinPointingSearch:
-                                                                              true,
-                                                                          usePlaceDetailSearch:
-                                                                              true,
-                                                                          zoomGesturesEnabled:
-                                                                              true,
-                                                                          zoomControlsEnabled:
-                                                                              true,
-                                                                          resizeToAvoidBottomInset:
-                                                                              false, // only works in page mode, less flickery, remove if wrong offsets
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  } catch (e) {
-                                                                    await placemarkFromCoordinates(
-                                                                            19.228825,
-                                                                            72.854118)
-                                                                        .then(
-                                                                            (valuePlaceMaker) {
-                                                                      Placemark
-                                                                          placeMark =
-                                                                          valuePlaceMaker[
-                                                                              0];
-                                                                      setState(
-                                                                          () {
-                                                                        addressModel.location = UserLocation(
-                                                                            latitude:
-                                                                                19.228825,
-                                                                            longitude:
-                                                                                72.854118);
-                                                                        String
-                                                                            currentLocation =
-                                                                            "${placeMark.name}, ${placeMark.subLocality}, ${placeMark.locality}, ${placeMark.administrativeArea}, ${placeMark.postalCode}, ${placeMark.country}";
-                                                                        addressModel.locality =
-                                                                            currentLocation;
-                                                                      });
-                                                                    });
-
-                                                                    MyAppState
-                                                                            .selectedPosotion =
-                                                                        addressModel;
-                                                                    await hideProgress();
-                                                                    getData();
-                                                                  }
-                                                                },
-                                                              );
-                                                            }
-                                                          },
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                'Home',
-                                                                style: GoogleFonts.poppins(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600),
-                                                              ),
-                                                              Icon(Icons
-                                                                  .keyboard_arrow_down)
-                                                            ],
-                                                          ),
+                                                              },
+                                                            );
+                                                          }
+                                                        },
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'Home',
+                                                              style: GoogleFonts.poppins(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                            Icon(Icons
+                                                                .keyboard_arrow_down)
+                                                          ],
                                                         ),
-                                                        Text(
-                                                            MyAppState
-                                                                .selectedPosotion
-                                                                .getFullAddress()
-                                                                .toString(),
-                                                            maxLines: 1,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              color: Color(
-                                                                  GREY_TEXT_COLOR),
-                                                              fontFamily:
-                                                                  "Poppinsr",
-                                                            )).tr(),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                      Text(
+                                                          MyAppState
+                                                              .selectedPosotion
+                                                              .getFullAddress()
+                                                              .toString(),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Color(
+                                                                GREY_TEXT_COLOR),
+                                                            fontFamily:
+                                                                "Poppinsr",
+                                                          )).tr(),
+                                                    ],
                                                   ),
-                                                  IconButton(
-                                                      splashRadius: 1,
-                                                      padding: EdgeInsets.zero,
-                                                      onPressed: () {},
-                                                      icon: Icon(Icons
-                                                          .local_mall_outlined))
-                                                ],
-                                              ),
+                                                ),
+                                                IconButton(
+                                                  splashRadius: 1,
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () {},
+                                                  icon: Icon(Icons
+                                                      .local_mall_outlined),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          Row(
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0),
+                                          child: Row(
                                             children: [
                                               Expanded(
                                                   child:
@@ -456,728 +462,725 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ],
                                           ),
+                                        ),
 
-                                          // Container(
-                                          //     padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-                                          //     child: Row(
-                                          //       children: [
-                                          //         Expanded(
-                                          //           child:
-                                          //               Text("Find your Store".tr(), style: TextStyle(fontSize: 22, color: Colors.white, fontFamily: "Poppinssb")).tr(),
-                                          //         ),
-                                          //         DropdownButton(
-                                          //           // Not necessary for Option 1
-                                          //           value: selctedOrderTypeValue,
-                                          //           isDense: true,
-                                          //           dropdownColor: Colors.black,
-                                          //           onChanged: (newValue) async {
-                                          //             int cartProd = 0;
-                                          //             await Provider.of<CartDatabase>(context, listen: false).allCartProducts.then((value) {
-                                          //               cartProd = value.length;
-                                          //             });
-                                          //
-                                          //             if (cartProd > 0) {
-                                          //               showDialog(
-                                          //                 context: context,
-                                          //                 builder: (BuildContext context) => ShowDialogToDismiss(
-                                          //                   title: '',
-                                          //                   content: "Do you really want to change the delivery option?".tr() + "Your cart will be empty".tr(),
-                                          //                   buttonText: 'CLOSE'.tr(),
-                                          //                   secondaryButtonText: 'OK'.tr(),
-                                          //                   action: () {
-                                          //                     Navigator.of(context).pop();
-                                          //                     Provider.of<CartDatabase>(context, listen: false).deleteAllProducts();
-                                          //                     setState(() {
-                                          //                       selctedOrderTypeValue = newValue.toString();
-                                          //                       saveFoodTypeValue();
-                                          //                       getData();
-                                          //                     });
-                                          //                   },
-                                          //                 ),
-                                          //               );
-                                          //             } else {
-                                          //               setState(() {
-                                          //                 selctedOrderTypeValue = newValue.toString();
-                                          //
-                                          //                 saveFoodTypeValue();
-                                          //                 getData();
-                                          //               });
-                                          //             }
-                                          //           },
-                                          //           icon: const Icon(
-                                          //             Icons.keyboard_arrow_down,
-                                          //             color: Colors.white,
-                                          //           ),
-                                          //           items: [
-                                          //             'Delivery'.tr(),
-                                          //             'Takeaway'.tr(),
-                                          //           ].map((location) {
-                                          //             return DropdownMenuItem(
-                                          //               child: Text(location, style: TextStyle(color: Colors.white)),
-                                          //               value: location,
-                                          //             );
-                                          //           }).toList(),
-                                          //         )
-                                          //       ],
-                                          //     )),
-                                        ]),
-                                  ),
+                                        // Container(
+                                        //     padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+                                        //     child: Row(
+                                        //       children: [
+                                        //         Expanded(
+                                        //           child:
+                                        //               Text("Find your Store".tr(), style: TextStyle(fontSize: 22, color: Colors.white, fontFamily: "Poppinssb")).tr(),
+                                        //         ),
+                                        //         DropdownButton(
+                                        //           // Not necessary for Option 1
+                                        //           value: selctedOrderTypeValue,
+                                        //           isDense: true,
+                                        //           dropdownColor: Colors.black,
+                                        //           onChanged: (newValue) async {
+                                        //             int cartProd = 0;
+                                        //             await Provider.of<CartDatabase>(context, listen: false).allCartProducts.then((value) {
+                                        //               cartProd = value.length;
+                                        //             });
+                                        //
+                                        //             if (cartProd > 0) {
+                                        //               showDialog(
+                                        //                 context: context,
+                                        //                 builder: (BuildContext context) => ShowDialogToDismiss(
+                                        //                   title: '',
+                                        //                   content: "Do you really want to change the delivery option?".tr() + "Your cart will be empty".tr(),
+                                        //                   buttonText: 'CLOSE'.tr(),
+                                        //                   secondaryButtonText: 'OK'.tr(),
+                                        //                   action: () {
+                                        //                     Navigator.of(context).pop();
+                                        //                     Provider.of<CartDatabase>(context, listen: false).deleteAllProducts();
+                                        //                     setState(() {
+                                        //                       selctedOrderTypeValue = newValue.toString();
+                                        //                       saveFoodTypeValue();
+                                        //                       getData();
+                                        //                     });
+                                        //                   },
+                                        //                 ),
+                                        //               );
+                                        //             } else {
+                                        //               setState(() {
+                                        //                 selctedOrderTypeValue = newValue.toString();
+                                        //
+                                        //                 saveFoodTypeValue();
+                                        //                 getData();
+                                        //               });
+                                        //             }
+                                        //           },
+                                        //           icon: const Icon(
+                                        //             Icons.keyboard_arrow_down,
+                                        //             color: Colors.white,
+                                        //           ),
+                                        //           items: [
+                                        //             'Delivery'.tr(),
+                                        //             'Takeaway'.tr(),
+                                        //           ].map((location) {
+                                        //             return DropdownMenuItem(
+                                        //               child: Text(location, style: TextStyle(color: Colors.white)),
+                                        //               value: location,
+                                        //             );
+                                        //           }).toList(),
+                                        //         )
+                                        //       ],
+                                        //     )),
+                                      ]),
                                 ),
+                              ),
 
-                                buildTitleRow(
-                                  titleValue: "Shop by Category".tr(),
-                                  onClick: () {
-                                    push(
-                                      context,
-                                      const CuisinesScreen(
-                                        isPageCallFromHomeScreen: true,
+                              buildTitleRow(
+                                titleValue: "Shop by Category".tr(),
+                                onClick: () {
+                                  push(
+                                    context,
+                                    const CuisinesScreen(
+                                      isPageCallFromHomeScreen: true,
+                                    ),
+                                  );
+                                },
+                              ),
+                              Container(
+                                color: isDarkMode(context)
+                                    ? const Color(DARK_COLOR)
+                                    : const Color(0xffFFFFFF),
+                                child: FutureBuilder<List<VendorCategoryModel>>(
+                                    future: fireStoreUtils.getCuisines(),
+                                    initialData: const [],
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                          child: CircularProgressIndicator
+                                              .adaptive(
+                                            valueColor: AlwaysStoppedAnimation(
+                                                Color(COLOR_PRIMARY)),
+                                          ),
+                                        );
+                                      }
+
+                                      if ((snapshot.hasData ||
+                                              (snapshot.data?.isNotEmpty ??
+                                                  false)) &&
+                                          mounted) {
+                                        return Container(
+                                            // height: 150,
+                                            child: Expanded(
+                                          child: GridView.builder(
+                                            shrinkWrap: true,
+                                            // scrollDirection:
+                                            //     Axis.horizontal,
+                                            itemCount: 6,
+                                            // snapshot.data!.length >= 8
+                                            //     ? 8
+                                            //     : snapshot
+                                            //         .data!.length,
+                                            itemBuilder: (context, index) {
+                                              return buildCategoryItem(
+                                                  snapshot.data![index]);
+                                            },
+                                            gridDelegate:
+                                                SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 4,
+                                              childAspectRatio: 0.7,
+                                            ),
+                                          ),
+                                        ));
+                                      } else {
+                                        return showEmptyState(
+                                            'No Categories'.tr(), context);
+                                      }
+                                    }),
+                              ),
+                              Visibility(
+                                visible: bannerTopHome.isNotEmpty,
+                                child: Container(
+                                    color: isDarkMode(context)
+                                        ? const Color(DARK_COLOR)
+                                        : const Color(0xffFFFFFF),
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: isHomeBannerLoading
+                                        ? const Center(
+                                            child: CircularProgressIndicator())
+                                        : SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.23,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: PageView.builder(
+                                                  padEnds: false,
+                                                  itemCount:
+                                                      bannerTopHome.length,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  controller: _controller,
+                                                  itemBuilder:
+                                                      (context, index) =>
+                                                          buildBestDealPage(
+                                                              bannerTopHome[
+                                                                  index])),
+                                            ))),
+                              ),
+                              // Column(
+                              //   mainAxisAlignment: MainAxisAlignment.start,
+                              //   children: [
+                              //     buildTitleRow(
+                              //       titleValue: "Top Selling".tr(),
+                              //       onClick: () {
+                              //         push(
+                              //           context,
+                              //           const ViewAllPopularFoodNearByScreen(),
+                              //         );
+                              //       },
+                              //     ),
+                              //     SizedBox(
+                              //       height: 120,
+                              //       child: lstNearByFood.isEmpty
+                              //           ? showEmptyState(
+                              //               'No popular Item found'.tr(),
+                              //               context)
+                              //           : ListView.builder(
+                              //               scrollDirection: Axis.horizontal,
+                              //               itemCount:
+                              //                   lstNearByFood.length >= 15
+                              //                       ? 15
+                              //                       : lstNearByFood.length,
+                              //               itemBuilder: (context, index) {
+                              //                 VendorModel?
+                              //                     popularNearFoodVendorModel;
+                              //                 if (vendors.isNotEmpty) {
+                              //                   for (int a = 0;
+                              //                       a < vendors.length;
+                              //                       a++) {
+                              //                     if (vendors[a].id ==
+                              //                         lstNearByFood[index]
+                              //                             .vendorID) {
+                              //                       popularNearFoodVendorModel =
+                              //                           vendors[a];
+                              //                     }
+                              //                   }
+                              //                 }
+                              //                 return popularNearFoodVendorModel ==
+                              //                         null
+                              //                     ? Container()
+                              //                     : popularFoodItem(
+                              //                         context,
+                              //                         lstNearByFood[index],
+                              //                         popularNearFoodVendorModel);
+                              //               }),
+                              //     ),
+                              //   ],
+                              // ),
+                              // Column(
+                              //   mainAxisAlignment: MainAxisAlignment.start,
+                              //   children: [
+                              //     buildTitleRow(
+                              //       titleValue: "New Arrivals".tr(),
+                              //       onClick: () {
+                              //         push(
+                              //           context,
+                              //           const ViewAllNewArrivalRestaurantScreen(),
+                              //         );
+                              //       },
+                              //     ),
+                              //     StreamBuilder<List<VendorModel>>(
+                              //         stream: fireStoreUtils.getVendorsForNewArrival().asBroadcastStream(),
+                              //         initialData: const [],
+                              //         builder: (context, snapshot) {
+                              //           if (snapshot.connectionState == ConnectionState.waiting) {
+                              //             return Center(
+                              //               child: CircularProgressIndicator.adaptive(
+                              //                 valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                              //               ),
+                              //             );
+                              //           }
+                              //
+                              //           if ((snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) && mounted) {
+                              //             newArrivalLst = snapshot.data!;
+                              //
+                              //             return newArrivalLst.isEmpty
+                              //                 ? showEmptyState('No Vendors'.tr(), context)
+                              //                 : Container(
+                              //                     width: MediaQuery.of(context).size.width,
+                              //                     height: 260,
+                              //                     margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
+                              //                     child: ListView.builder(
+                              //                         shrinkWrap: true,
+                              //                         scrollDirection: Axis.horizontal,
+                              //                         physics: const BouncingScrollPhysics(),
+                              //                         itemCount: newArrivalLst.length >= 15 ? 15 : newArrivalLst.length,
+                              //                         itemBuilder: (context, index) => buildNewArrivalItem(newArrivalLst[index])));
+                              //           } else {
+                              //             return showEmptyState('No Vendors'.tr(), context);
+                              //           }
+                              //         }),
+                              //   ],
+                              // ),
+                              buildTitleRow(
+                                titleValue: "Offers For You".tr(),
+                                onClick: () {
+                                  push(
+                                    context,
+                                    OffersScreen(
+                                      vendors: vendors,
+                                    ),
+                                  );
+                                },
+                              ),
+                              offerVendorList.isEmpty
+                                  ? showEmptyState(
+                                      'No Offers Found'.tr(), context)
+                                  : Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 300,
+                                      margin: const EdgeInsets.fromLTRB(
+                                          10, 0, 0, 10),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemCount: offerVendorList.length >= 15
+                                            ? 15
+                                            : offerVendorList.length,
+                                        itemBuilder: (context, index) {
+                                          return buildCouponsForYouItem(
+                                              context,
+                                              offerVendorList[index],
+                                              offersList[index]);
+                                        },
                                       ),
-                                    );
-                                  },
-                                ),
-                                Container(
+                                    ),
+                              Visibility(
+                                visible: bannerMiddleHome.isNotEmpty,
+                                child: Container(
                                   color: isDarkMode(context)
                                       ? const Color(DARK_COLOR)
                                       : const Color(0xffFFFFFF),
-                                  child: FutureBuilder<
-                                          List<VendorCategoryModel>>(
-                                      future: fireStoreUtils.getCuisines(),
-                                      initialData: const [],
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Center(
-                                            child: CircularProgressIndicator
-                                                .adaptive(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation(
-                                                      Color(COLOR_PRIMARY)),
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: isHomeBannerMiddleLoading
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.23,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: PageView.builder(
+                                              padEnds: false,
+                                              itemCount:
+                                                  bannerMiddleHome.length,
+                                              scrollDirection: Axis.horizontal,
+                                              controller: _controller,
+                                              itemBuilder: (context, index) =>
+                                                  buildBestDealPage(
+                                                bannerMiddleHome[index],
+                                              ),
                                             ),
-                                          );
-                                        }
-
-                                        if ((snapshot.hasData ||
-                                                (snapshot.data?.isNotEmpty ??
-                                                    false)) &&
-                                            mounted) {
-                                          return Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              // height: 150,
-                                              child: Expanded(
-                                                child: GridView.builder(
-                                                  shrinkWrap: true,
-                                                  // scrollDirection:
-                                                  //     Axis.horizontal,
-                                                  itemCount: 1,
-                                                  // snapshot.data!.length >= 8
-                                                  //     ? 8
-                                                  //     : snapshot
-                                                  //         .data!.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return buildCategoryItem(
-                                                        snapshot.data![index]);
-                                                  },
-                                                  gridDelegate:
-                                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                                          crossAxisCount: 4),
-                                                ),
-                                              ));
-                                        } else {
-                                          return showEmptyState(
-                                              'No Categories'.tr(), context);
-                                        }
-                                      }),
+                                          ),
+                                        ),
                                 ),
-                                Visibility(
-                                  visible: bannerTopHome.isNotEmpty,
-                                  child: Container(
-                                      color: isDarkMode(context)
-                                          ? const Color(DARK_COLOR)
-                                          : const Color(0xffFFFFFF),
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: isHomeBannerLoading
-                                          ? const Center(
-                                              child:
-                                                  CircularProgressIndicator())
-                                          : SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.23,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: PageView.builder(
-                                                    padEnds: false,
-                                                    itemCount:
-                                                        bannerTopHome.length,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    controller: _controller,
-                                                    itemBuilder: (context,
-                                                            index) =>
-                                                        buildBestDealPage(
-                                                            bannerTopHome[
-                                                                index])),
-                                              ))),
-                                ),
-                                // Column(
-                                //   mainAxisAlignment: MainAxisAlignment.start,
-                                //   children: [
-                                //     buildTitleRow(
-                                //       titleValue: "Top Selling".tr(),
-                                //       onClick: () {
-                                //         push(
-                                //           context,
-                                //           const ViewAllPopularFoodNearByScreen(),
-                                //         );
-                                //       },
-                                //     ),
-                                //     SizedBox(
-                                //       height: 120,
-                                //       child: lstNearByFood.isEmpty
-                                //           ? showEmptyState(
-                                //               'No popular Item found'.tr(),
-                                //               context)
-                                //           : ListView.builder(
-                                //               scrollDirection: Axis.horizontal,
-                                //               itemCount:
-                                //                   lstNearByFood.length >= 15
-                                //                       ? 15
-                                //                       : lstNearByFood.length,
-                                //               itemBuilder: (context, index) {
-                                //                 VendorModel?
-                                //                     popularNearFoodVendorModel;
-                                //                 if (vendors.isNotEmpty) {
-                                //                   for (int a = 0;
-                                //                       a < vendors.length;
-                                //                       a++) {
-                                //                     if (vendors[a].id ==
-                                //                         lstNearByFood[index]
-                                //                             .vendorID) {
-                                //                       popularNearFoodVendorModel =
-                                //                           vendors[a];
-                                //                     }
-                                //                   }
-                                //                 }
-                                //                 return popularNearFoodVendorModel ==
-                                //                         null
-                                //                     ? Container()
-                                //                     : popularFoodItem(
-                                //                         context,
-                                //                         lstNearByFood[index],
-                                //                         popularNearFoodVendorModel);
-                                //               }),
-                                //     ),
-                                //   ],
-                                // ),
-                                // Column(
-                                //   mainAxisAlignment: MainAxisAlignment.start,
-                                //   children: [
-                                //     buildTitleRow(
-                                //       titleValue: "New Arrivals".tr(),
-                                //       onClick: () {
-                                //         push(
-                                //           context,
-                                //           const ViewAllNewArrivalRestaurantScreen(),
-                                //         );
-                                //       },
-                                //     ),
-                                //     StreamBuilder<List<VendorModel>>(
-                                //         stream: fireStoreUtils.getVendorsForNewArrival().asBroadcastStream(),
-                                //         initialData: const [],
-                                //         builder: (context, snapshot) {
-                                //           if (snapshot.connectionState == ConnectionState.waiting) {
-                                //             return Center(
-                                //               child: CircularProgressIndicator.adaptive(
-                                //                 valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                                //               ),
-                                //             );
-                                //           }
-                                //
-                                //           if ((snapshot.hasData || (snapshot.data?.isNotEmpty ?? false)) && mounted) {
-                                //             newArrivalLst = snapshot.data!;
-                                //
-                                //             return newArrivalLst.isEmpty
-                                //                 ? showEmptyState('No Vendors'.tr(), context)
-                                //                 : Container(
-                                //                     width: MediaQuery.of(context).size.width,
-                                //                     height: 260,
-                                //                     margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
-                                //                     child: ListView.builder(
-                                //                         shrinkWrap: true,
-                                //                         scrollDirection: Axis.horizontal,
-                                //                         physics: const BouncingScrollPhysics(),
-                                //                         itemCount: newArrivalLst.length >= 15 ? 15 : newArrivalLst.length,
-                                //                         itemBuilder: (context, index) => buildNewArrivalItem(newArrivalLst[index])));
-                                //           } else {
-                                //             return showEmptyState('No Vendors'.tr(), context);
-                                //           }
-                                //         }),
-                                //   ],
-                                // ),
-                                // buildTitleRow(
-                                //   titleValue: "Offers For You".tr(),
-                                //   onClick: () {
-                                //     push(
-                                //       context,
-                                //       OffersScreen(
-                                //         vendors: vendors,
-                                //       ),
-                                //     );
-                                //   },
-                                // ),
-                                // offerVendorList.isEmpty
-                                //     ? showEmptyState(
-                                //         'No Offers Found'.tr(), context)
-                                //     : Container(
-                                //         width:
-                                //             MediaQuery.of(context).size.width,
-                                //         height: 300,
-                                //         margin: const EdgeInsets.fromLTRB(
-                                //             10, 0, 0, 10),
-                                //         child: ListView.builder(
-                                //           shrinkWrap: true,
-                                //           scrollDirection: Axis.horizontal,
-                                //           physics:
-                                //               const BouncingScrollPhysics(),
-                                //           itemCount:
-                                //               offerVendorList.length >= 15
-                                //                   ? 15
-                                //                   : offerVendorList.length,
-                                //           itemBuilder: (context, index) {
-                                //             return buildCouponsForYouItem(
-                                //                 context,
-                                //                 offerVendorList[index],
-                                //                 offersList[index]);
-                                //           },
-                                //         ),
-                                //       ),
-                                Visibility(
-                                  visible: bannerMiddleHome.isNotEmpty,
-                                  child: Container(
-                                      color: isDarkMode(context)
-                                          ? const Color(DARK_COLOR)
-                                          : const Color(0xffFFFFFF),
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: isHomeBannerMiddleLoading
-                                          ? const Center(
-                                              child:
-                                                  CircularProgressIndicator())
-                                          : SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.23,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: PageView.builder(
-                                                    padEnds: false,
-                                                    itemCount:
-                                                        bannerMiddleHome.length,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    controller: _controller,
-                                                    itemBuilder: (context,
-                                                            index) =>
-                                                        buildBestDealPage(
-                                                            bannerMiddleHome[
-                                                                index])),
-                                              ))),
-                                ),
-                                // Column(
-                                //   children: [
-                                //     buildTitleRow(
-                                //       titleValue: "Popular Stores".tr(),
-                                //       onClick: () {
-                                //         push(
-                                //           context,
-                                //           const ViewAllPopularRestaurantScreen(),
-                                //         );
-                                //       },
-                                //     ),
-                                //     popularRestaurantLst.isEmpty
-                                //         ? showEmptyState('No Popular store'.tr(), context)
-                                //         : Container(
-                                //             width: MediaQuery.of(context).size.width,
-                                //             height: 260,
-                                //             margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
-                                //             child: ListView.builder(
-                                //                 shrinkWrap: true,
-                                //                 scrollDirection: Axis.horizontal,
-                                //                 physics: const BouncingScrollPhysics(),
-                                //                 itemCount: popularRestaurantLst.length >= 5 ? 5 : popularRestaurantLst.length,
-                                //                 itemBuilder: (context, index) => buildPopularsItem(popularRestaurantLst[index]))),
-                                //   ],
-                                // ),
-                                ListView.builder(
-                                  itemCount: categoryWiseProductList.length,
-                                  shrinkWrap: true,
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, index) {
-                                    return StreamBuilder<List<VendorModel>>(
-                                      stream: FireStoreUtils()
-                                          .getCategoryRestaurants(
-                                              categoryWiseProductList[index]
-                                                  .id
-                                                  .toString()),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Center(
-                                            child: CircularProgressIndicator
-                                                .adaptive(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation(
-                                                      Color(COLOR_PRIMARY)),
-                                            ),
-                                          );
-                                        }
-                                        if ((snapshot.hasData ||
-                                                (snapshot.data?.isNotEmpty ??
-                                                    false)) &&
-                                            mounted) {
-                                          return snapshot.data!.isEmpty
-                                              ? Container()
-                                              : Column(
-                                                  children: [
-                                                    buildTitleRow(
-                                                      titleValue:
-                                                          categoryWiseProductList[
-                                                                  index]
-                                                              .title
-                                                              .toString(),
-                                                      onClick: () {
-                                                        push(
-                                                          context,
-                                                          ViewAllCategoryProductScreen(
-                                                            vendorCategoryModel:
-                                                                categoryWiseProductList[
-                                                                    index],
-                                                          ),
-                                                        );
-                                                      },
-                                                      isViewAll: false,
-                                                    ),
-                                                    SizedBox(
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width,
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.28,
-                                                        child: Padding(
+                              ),
+                              // Column(
+                              //   children: [
+                              //     buildTitleRow(
+                              //       titleValue: "Popular Stores".tr(),
+                              //       onClick: () {
+                              //         push(
+                              //           context,
+                              //           const ViewAllPopularRestaurantScreen(),
+                              //         );
+                              //       },
+                              //     ),
+                              //     popularRestaurantLst.isEmpty
+                              //         ? showEmptyState('No Popular store'.tr(), context)
+                              //         : Container(
+                              //             width: MediaQuery.of(context).size.width,
+                              //             height: 260,
+                              //             margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
+                              //             child: ListView.builder(
+                              //                 shrinkWrap: true,
+                              //                 scrollDirection: Axis.horizontal,
+                              //                 physics: const BouncingScrollPhysics(),
+                              //                 itemCount: popularRestaurantLst.length >= 5 ? 5 : popularRestaurantLst.length,
+                              //                 itemBuilder: (context, index) => buildPopularsItem(popularRestaurantLst[index]))),
+                              //   ],
+                              // ),
+                              ListView.builder(
+                                itemCount: categoryWiseProductList.length,
+                                shrinkWrap: true,
+                                physics: const BouncingScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                itemBuilder: (context, index) {
+                                  return StreamBuilder<List<VendorModel>>(
+                                    stream: FireStoreUtils()
+                                        .getCategoryRestaurants(
+                                            categoryWiseProductList[index]
+                                                .id
+                                                .toString()),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                          child: CircularProgressIndicator
+                                              .adaptive(
+                                            valueColor: AlwaysStoppedAnimation(
+                                                Color(COLOR_PRIMARY)),
+                                          ),
+                                        );
+                                      }
+                                      if ((snapshot.hasData ||
+                                              (snapshot.data?.isNotEmpty ??
+                                                  false)) &&
+                                          mounted) {
+                                        return snapshot.data!.isEmpty
+                                            ? Container()
+                                            : Column(
+                                                children: [
+                                                  buildTitleRow(
+                                                    titleValue:
+                                                        categoryWiseProductList[
+                                                                index]
+                                                            .title
+                                                            .toString(),
+                                                    onClick: () {
+                                                      push(
+                                                        context,
+                                                        ViewAllCategoryProductScreen(
+                                                          vendorCategoryModel:
+                                                              categoryWiseProductList[
+                                                                  index],
+                                                        ),
+                                                      );
+                                                    },
+                                                    isViewAll: false,
+                                                  ),
+                                                  SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height *
+                                                              0.28,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 10),
+                                                        child: ListView.builder(
+                                                          shrinkWrap: true,
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          physics:
+                                                              const BouncingScrollPhysics(),
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      10),
-                                                          child:
-                                                              ListView.builder(
-                                                            shrinkWrap: true,
-                                                            scrollDirection:
-                                                                Axis.horizontal,
-                                                            physics:
-                                                                const BouncingScrollPhysics(),
-                                                            padding:
-                                                                EdgeInsets.zero,
-                                                            itemCount: snapshot
-                                                                .data!.length,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              VendorModel
-                                                                  vendorModel =
-                                                                  snapshot.data![
-                                                                      index];
-                                                              double distanceInMeters = Geolocator.distanceBetween(
-                                                                  vendorModel
-                                                                      .latitude,
-                                                                  vendorModel
-                                                                      .longitude,
-                                                                  MyAppState
-                                                                      .selectedPosotion
-                                                                      .location!
-                                                                      .latitude,
-                                                                  MyAppState
-                                                                      .selectedPosotion
-                                                                      .location!
-                                                                      .longitude);
-                                                              double kilometer =
-                                                                  distanceInMeters /
-                                                                      1000;
-                                                              double minutes =
-                                                                  1.2;
-                                                              double value =
-                                                                  minutes *
-                                                                      kilometer;
-                                                              final int hour =
-                                                                  value ~/ 60;
-                                                              final double
-                                                                  minute =
-                                                                  value % 60;
-                                                              return Container(
-                                                                margin: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        10,
-                                                                    vertical:
-                                                                        8),
-                                                                child:
-                                                                    GestureDetector(
-                                                                  onTap:
-                                                                      () async {
-                                                                    push(
-                                                                      context,
-                                                                      NewVendorProductsScreen(
-                                                                          vendorModel:
-                                                                              vendorModel),
-                                                                    );
-                                                                  },
+                                                              EdgeInsets.zero,
+                                                          itemCount: snapshot
+                                                              .data!.length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            VendorModel
+                                                                vendorModel =
+                                                                snapshot.data![
+                                                                    index];
+                                                            double distanceInMeters = Geolocator.distanceBetween(
+                                                                vendorModel
+                                                                    .latitude,
+                                                                vendorModel
+                                                                    .longitude,
+                                                                MyAppState
+                                                                    .selectedPosotion
+                                                                    .location!
+                                                                    .latitude,
+                                                                MyAppState
+                                                                    .selectedPosotion
+                                                                    .location!
+                                                                    .longitude);
+                                                            double kilometer =
+                                                                distanceInMeters /
+                                                                    1000;
+                                                            double minutes =
+                                                                1.2;
+                                                            double value =
+                                                                minutes *
+                                                                    kilometer;
+                                                            final int hour =
+                                                                value ~/ 60;
+                                                            final double
+                                                                minute =
+                                                                value % 60;
+                                                            return Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10,
+                                                                      vertical:
+                                                                          8),
+                                                              child:
+                                                                  GestureDetector(
+                                                                onTap:
+                                                                    () async {
+                                                                  push(
+                                                                    context,
+                                                                    NewVendorProductsScreen(
+                                                                        vendorModel:
+                                                                            vendorModel),
+                                                                  );
+                                                                },
+                                                                child: SizedBox(
+                                                                  width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.65,
                                                                   child:
-                                                                      SizedBox(
-                                                                    width: MediaQuery.of(context)
-                                                                            .size
-                                                                            .width *
-                                                                        0.65,
-                                                                    child:
-                                                                        Container(
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(20),
-                                                                        border: Border.all(
-                                                                            color: isDarkMode(context)
-                                                                                ? const Color(DarkContainerBorderColor)
-                                                                                : Colors.grey.shade100,
-                                                                            width: 1),
-                                                                        color: isDarkMode(context)
-                                                                            ? const Color(DarkContainerColor)
-                                                                            : Colors.white,
-                                                                        boxShadow: [
-                                                                          isDarkMode(context)
-                                                                              ? const BoxShadow()
-                                                                              : BoxShadow(
-                                                                                  color: Colors.grey.withOpacity(0.5),
-                                                                                  blurRadius: 5,
-                                                                                ),
-                                                                        ],
-                                                                      ),
-                                                                      child:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Expanded(
-                                                                              child: Stack(
-                                                                            children: [
-                                                                              CachedNetworkImage(
-                                                                                imageUrl: getImageVAlidUrl(vendorModel.photo),
-                                                                                imageBuilder: (context, imageProvider) => Container(
-                                                                                  decoration: BoxDecoration(
-                                                                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                                                                                    image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                                                                  ),
-                                                                                ),
-                                                                                placeholder: (context, url) => Center(
-                                                                                    child: CircularProgressIndicator.adaptive(
-                                                                                  valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                                                                                )),
-                                                                                errorWidget: (context, url, error) => ClipRRect(
-                                                                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                                                                                  child: Image.network(
-                                                                                    AppGlobal.placeHolderImage!,
-                                                                                    width: MediaQuery.of(context).size.width * 0.75,
-                                                                                    fit: BoxFit.contain,
-                                                                                  ),
-                                                                                ),
-                                                                                fit: BoxFit.cover,
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20),
+                                                                      border: Border.all(
+                                                                          color: isDarkMode(context)
+                                                                              ? const Color(DarkContainerBorderColor)
+                                                                              : Colors.grey.shade100,
+                                                                          width: 1),
+                                                                      color: isDarkMode(context)
+                                                                          ? const Color(
+                                                                              DarkContainerColor)
+                                                                          : Colors
+                                                                              .white,
+                                                                      boxShadow: [
+                                                                        isDarkMode(context)
+                                                                            ? const BoxShadow()
+                                                                            : BoxShadow(
+                                                                                color: Colors.grey.withOpacity(0.5),
+                                                                                blurRadius: 5,
                                                                               ),
-                                                                              Positioned(
-                                                                                bottom: 10,
-                                                                                right: 10,
-                                                                                child: Container(
-                                                                                  decoration: BoxDecoration(
-                                                                                    color: Colors.green,
-                                                                                    borderRadius: BorderRadius.circular(5),
-                                                                                  ),
-                                                                                  child: Padding(
-                                                                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                                                    child: Row(
-                                                                                      mainAxisSize: MainAxisSize.min,
-                                                                                      children: [
-                                                                                        Text(vendorModel.reviewsCount != 0 ? (vendorModel.reviewsSum / vendorModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
-                                                                                            style: const TextStyle(
-                                                                                              fontFamily: "Poppinsm",
-                                                                                              letterSpacing: 0.5,
-                                                                                              fontSize: 12,
-                                                                                              color: Colors.white,
-                                                                                            )),
-                                                                                        const SizedBox(width: 3),
-                                                                                        const Icon(
-                                                                                          Icons.star,
-                                                                                          size: 16,
-                                                                                          color: Colors.white,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Expanded(
+                                                                            child:
+                                                                                Stack(
+                                                                          children: [
+                                                                            CachedNetworkImage(
+                                                                              imageUrl: getImageVAlidUrl(vendorModel.photo),
+                                                                              imageBuilder: (context, imageProvider) => Container(
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                                                                                  image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                                                                ),
+                                                                              ),
+                                                                              placeholder: (context, url) => Center(
+                                                                                  child: CircularProgressIndicator.adaptive(
+                                                                                valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                                                                              )),
+                                                                              errorWidget: (context, url, error) => ClipRRect(
+                                                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                                                                                child: Image.network(
+                                                                                  AppGlobal.placeHolderImage!,
+                                                                                  width: MediaQuery.of(context).size.width * 0.75,
+                                                                                  fit: BoxFit.contain,
+                                                                                ),
+                                                                              ),
+                                                                              fit: BoxFit.cover,
+                                                                            ),
+                                                                            Positioned(
+                                                                              bottom: 10,
+                                                                              right: 10,
+                                                                              child: Container(
+                                                                                decoration: BoxDecoration(
+                                                                                  color: Colors.green,
+                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                ),
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                                                  child: Row(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    children: [
+                                                                                      Text(vendorModel.reviewsCount != 0 ? (vendorModel.reviewsSum / vendorModel.reviewsCount).toStringAsFixed(1) : 0.toString(),
+                                                                                          style: const TextStyle(
+                                                                                            fontFamily: "Poppinsm",
+                                                                                            letterSpacing: 0.5,
+                                                                                            fontSize: 12,
+                                                                                            color: Colors.white,
+                                                                                          )),
+                                                                                      const SizedBox(width: 3),
+                                                                                      const Icon(
+                                                                                        Icons.star,
+                                                                                        size: 16,
+                                                                                        color: Colors.white,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        )),
+                                                                        const SizedBox(
+                                                                            height:
+                                                                                5),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                              horizontal: 5),
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(vendorModel.title, maxLines: 1, style: TextStyle(fontFamily: "Poppinsm", fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.2)).tr(),
+                                                                              const SizedBox(
+                                                                                height: 5,
+                                                                              ),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(
+                                                                                    Icons.location_pin,
+                                                                                    color: Color(COLOR_PRIMARY),
+                                                                                    size: 20,
+                                                                                  ),
+                                                                                  SizedBox(width: 5),
+                                                                                  Expanded(
+                                                                                    child: Text(vendorModel.location, maxLines: 1, style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60))).tr(),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                height: 5,
+                                                                              ),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(
+                                                                                    Icons.timer_sharp,
+                                                                                    color: Color(COLOR_PRIMARY),
+                                                                                    size: 20,
+                                                                                  ),
+                                                                                  SizedBox(
+                                                                                    width: 5,
+                                                                                  ),
+                                                                                  Text(
+                                                                                    '${hour.toString().padLeft(2, "0")}h ${minute.toStringAsFixed(0).padLeft(2, "0")}m',
+                                                                                    style: TextStyle(fontFamily: "Poppinsm", letterSpacing: 0.5, color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60)),
+                                                                                  ),
+                                                                                  SizedBox(
+                                                                                    width: 10,
+                                                                                  ),
+                                                                                  Icon(
+                                                                                    Icons.my_location_sharp,
+                                                                                    color: Color(COLOR_PRIMARY),
+                                                                                    size: 20,
+                                                                                  ),
+                                                                                  SizedBox(
+                                                                                    width: 10,
+                                                                                  ),
+                                                                                  Text(
+                                                                                    "${kilometer.toDouble().toStringAsFixed(currencyModel!.decimal)} km",
+                                                                                    style: TextStyle(fontFamily: "Poppinsm", letterSpacing: 0.5, color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60)),
+                                                                                  ).tr(),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(
+                                                                                height: 5,
                                                                               ),
                                                                             ],
-                                                                          )),
-                                                                          const SizedBox(
-                                                                              height: 5),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.symmetric(horizontal: 5),
-                                                                            child:
-                                                                                Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Text(vendorModel.title, maxLines: 1, style: TextStyle(fontFamily: "Poppinsm", fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.2)).tr(),
-                                                                                const SizedBox(
-                                                                                  height: 5,
-                                                                                ),
-                                                                                Row(
-                                                                                  children: [
-                                                                                    Icon(
-                                                                                      Icons.location_pin,
-                                                                                      color: Color(COLOR_PRIMARY),
-                                                                                      size: 20,
-                                                                                    ),
-                                                                                    SizedBox(width: 5),
-                                                                                    Expanded(
-                                                                                      child: Text(vendorModel.location, maxLines: 1, style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60))).tr(),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                                const SizedBox(
-                                                                                  height: 5,
-                                                                                ),
-                                                                                Row(
-                                                                                  children: [
-                                                                                    Icon(
-                                                                                      Icons.timer_sharp,
-                                                                                      color: Color(COLOR_PRIMARY),
-                                                                                      size: 20,
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      width: 5,
-                                                                                    ),
-                                                                                    Text(
-                                                                                      '${hour.toString().padLeft(2, "0")}h ${minute.toStringAsFixed(0).padLeft(2, "0")}m',
-                                                                                      style: TextStyle(fontFamily: "Poppinsm", letterSpacing: 0.5, color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60)),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      width: 10,
-                                                                                    ),
-                                                                                    Icon(
-                                                                                      Icons.my_location_sharp,
-                                                                                      color: Color(COLOR_PRIMARY),
-                                                                                      size: 20,
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      width: 10,
-                                                                                    ),
-                                                                                    Text(
-                                                                                      "${kilometer.toDouble().toStringAsFixed(currencyModel!.decimal)} km",
-                                                                                      style: TextStyle(fontFamily: "Poppinsm", letterSpacing: 0.5, color: isDarkMode(context) ? Colors.white : Colors.black.withOpacity(0.60)),
-                                                                                    ).tr(),
-                                                                                  ],
-                                                                                ),
-                                                                                SizedBox(
-                                                                                  height: 5,
-                                                                                ),
-                                                                              ],
-                                                                            ),
                                                                           ),
-                                                                        ],
-                                                                      ),
+                                                                        ),
+                                                                      ],
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        )),
-                                                  ],
-                                                );
-                                        } else {
-                                          return Container();
-                                        }
-                                      },
-                                    );
-                                  },
-                                ),
-                                // buildTitleRow(
-                                //   titleValue: "All Stores".tr(),
-                                //   onClick: () {},
-                                //   isViewAll: true,
-                                // ),
-                                // vendors.isEmpty
-                                //     ? showEmptyState('No Vendors'.tr(), context)
-                                //     : Container(
-                                //         width: MediaQuery.of(context).size.width,
-                                //         margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
-                                //         child: ListView.builder(
-                                //           shrinkWrap: true,
-                                //           scrollDirection: Axis.vertical,
-                                //           physics: const BouncingScrollPhysics(),
-                                //           itemCount: vendors.length > 15 ? 15 : vendors.length,
-                                //           itemBuilder: (context, index) {
-                                //             VendorModel vendorModel = vendors[index];
-                                //             return buildAllRestaurantsData(vendorModel);
-                                //           },
-                                //         ),
-                                //       ),
-                                // Center(
-                                //   child: Padding(
-                                //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                //     child: SizedBox(
-                                //       width: MediaQuery.of(context).size.width,
-                                //       height: MediaQuery.of(context).size.height * 0.06,
-                                //       child: ElevatedButton(
-                                //         style: ElevatedButton.styleFrom(
-                                //           backgroundColor: Color(COLOR_PRIMARY),
-                                //           shape: RoundedRectangleBorder(
-                                //             borderRadius: BorderRadius.circular(10.0),
-                                //             side: BorderSide(
-                                //               color: Color(COLOR_PRIMARY),
-                                //             ),
-                                //           ),
-                                //         ),
-                                //         child: Text(
-                                //           'See All Stores around you'.tr(),
-                                //           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
-                                //         ).tr(),
-                                //         onPressed: () {
-                                //           push(
-                                //             context,
-                                //             const ViewAllRestaurant(),
-                                //           );
-                                //         },
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-                              ],
-                            ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      )),
+                                                ],
+                                              );
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                              // buildTitleRow(
+                              //   titleValue: "All Stores".tr(),
+                              //   onClick: () {},
+                              //   isViewAll: true,
+                              // ),
+                              // vendors.isEmpty
+                              //     ? showEmptyState('No Vendors'.tr(), context)
+                              //     : Container(
+                              //         width: MediaQuery.of(context).size.width,
+                              //         margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
+                              //         child: ListView.builder(
+                              //           shrinkWrap: true,
+                              //           scrollDirection: Axis.vertical,
+                              //           physics: const BouncingScrollPhysics(),
+                              //           itemCount: vendors.length > 15 ? 15 : vendors.length,
+                              //           itemBuilder: (context, index) {
+                              //             VendorModel vendorModel = vendors[index];
+                              //             return buildAllRestaurantsData(vendorModel);
+                              //           },
+                              //         ),
+                              //       ),
+                              // Center(
+                              //   child: Padding(
+                              //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              //     child: SizedBox(
+                              //       width: MediaQuery.of(context).size.width,
+                              //       height: MediaQuery.of(context).size.height * 0.06,
+                              //       child: ElevatedButton(
+                              //         style: ElevatedButton.styleFrom(
+                              //           backgroundColor: Color(COLOR_PRIMARY),
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.circular(10.0),
+                              //             side: BorderSide(
+                              //               color: Color(COLOR_PRIMARY),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //         child: Text(
+                              //           'See All Stores around you'.tr(),
+                              //           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
+                              //         ).tr(),
+                              //         onPressed: () {
+                              //           push(
+                              //             context,
+                              //             const ViewAllRestaurant(),
+                              //           );
+                              //         },
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
                           ),
                         ),
                       ),
-                    )),
+                    ),
+                  ),
+      ),
     );
   }
 
@@ -1754,14 +1757,14 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           push(
             context,
-            CategoryDetailsScreen(
-              category: model,
-              isDineIn: false,
-            ),
+            Categorydetailsscreen(
+                // category: model,
+                // isDineIn: false,
+                ),
           );
         },
         child: Container(
-          color: Colors.amber,
+          // color: Colors.amber,
           child: Column(
             children: [
               CachedNetworkImage(
@@ -1769,7 +1772,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 imageBuilder: (context, imageProvider) => Container(
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(17),
                       border: Border.all(
                           color: isDarkMode(context)
                               ? const Color(DarkContainerBorderColor)
@@ -1791,16 +1794,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                           image: DecorationImage(
                             image: imageProvider,
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                           )),
                     ),
                   ),
                 ),
                 memCacheHeight:
-                    (MediaQuery.of(context).size.height * 0.11).toInt(),
+                    (MediaQuery.of(context).size.height * 0.15).toInt(),
                 memCacheWidth:
                     (MediaQuery.of(context).size.width * 0.23).toInt(),
                 placeholder: (context, url) => ClipOval(
@@ -1818,16 +1821,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       fit: BoxFit.cover,
                     )),
               ),
+              SizedBox(
+                height: 10,
+              ),
               Center(
-                  child: Text(model.title.toString(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDarkMode(context)
-                            ? Colors.white
-                            : const Color(0xFF000000),
-                        fontFamily: "Poppinsr",
-                      )).tr())
+                child: Text(
+                  model.title.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDarkMode(context)
+                        ? Colors.white
+                        : const Color(0xFF000000),
+                    fontFamily: "Poppinsr",
+                  ),
+                ).tr(),
+              ),
             ],
           ),
         ),

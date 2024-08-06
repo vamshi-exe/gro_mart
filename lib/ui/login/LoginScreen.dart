@@ -472,7 +472,7 @@ class _LoginScreen extends State<LoginScreen> {
             }
             pushAndRemoveUntil(
                 context,
-                Navigation(
+                NavigationController(
                   user: result,
                 ),
                 false);

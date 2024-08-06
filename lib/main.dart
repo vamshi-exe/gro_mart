@@ -21,6 +21,7 @@ import 'package:gromart_customer/services/localDatabase.dart';
 import 'package:gromart_customer/ui/auth/AuthScreen.dart';
 import 'package:gromart_customer/ui/container/ContainerScreen.dart';
 import 'package:gromart_customer/ui/location_permission_screen.dart';
+import 'package:gromart_customer/ui/navigation/navigation.dart';
 import 'package:gromart_customer/ui/onBoarding/OnBoardingScreen.dart';
 import 'package:gromart_customer/userPrefrence.dart';
 import 'package:gromart_customer/utils/DarkThemeProvider.dart';
@@ -258,7 +259,7 @@ class OnBoardingState extends State<OnBoarding> {
                   MyAppState.selectedPosotion =
                       MyAppState.currentUser!.shippingAddress!.first;
                 }
-                pushReplacement(context, ContainerScreen(user: user));
+                pushReplacement(context, NavigationController(user: user));
               } else {
                 pushAndRemoveUntil(context, LocationPermissionScreen(), false);
               }

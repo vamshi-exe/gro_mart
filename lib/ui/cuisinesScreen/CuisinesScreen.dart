@@ -68,13 +68,13 @@ class _CuisinesScreenState extends State<CuisinesScreen> {
     return Padding(
         padding: EdgeInsets.only(bottom: 12),
         child: GestureDetector(
-          onTap: () => push(
-            context,
-            CategoryDetailsScreen(
-              category: cuisineModel,
-              isDineIn: widget.isPageCallForDineIn!,
-            ),
-          ),
+          // onTap: () => push(
+          //   // context,
+          //   // // CategoryDetailsScreen(
+          //   // //   category: cuisineModel,
+          //   // //   isDineIn: widget.isPageCallForDineIn!,
+          //   // // ),
+          // ),
           child: Container(
             height: 140,
             decoration: BoxDecoration(

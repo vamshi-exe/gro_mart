@@ -689,14 +689,14 @@ class _DineInScreenState extends State<DineInScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
-        onTap: () {
-          push(
-              context,
-              CategoryDetailsScreen(
-                category: cuisineModel,
-                isDineIn: true,
-              ));
-        },
+        // onTap: () {
+        //   push(
+        //       context,
+        //       CategoryDetailsScreen(
+        //         category: cuisineModel,
+        //         isDineIn: true,
+        //       ));
+        // },
         child: Container(
           width: MediaQuery.of(context).size.width * 0.24,
           child: Column(

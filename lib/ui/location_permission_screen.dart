@@ -7,7 +7,6 @@ import 'package:gromart_customer/main.dart';
 import 'package:gromart_customer/model/AddressModel.dart';
 import 'package:gromart_customer/model/User.dart';
 import 'package:gromart_customer/services/helper.dart';
-import 'package:gromart_customer/ui/container/ContainerScreen.dart';
 import 'package:gromart_customer/ui/navigation/navigation.dart';
 import 'package:gromart_customer/widget/permission_dialog.dart';
 import 'package:geocoding/geocoding.dart';
@@ -113,7 +112,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                         //     ContainerScreen(user: MyAppState.currentUser),
                         //     false);
                         pushAndRemoveUntil(context,
-                            Navigation(user: MyAppState.currentUser!), false);
+                            NavigationController(user: MyAppState.currentUser!), false);
                       } catch (e) {
                         await placemarkFromCoordinates(19.228825, 72.854118)
                             .then((valuePlaceMaker) {
@@ -130,7 +129,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                         MyAppState.selectedPosotion = addressModel;
                         await hideProgress();
                         pushAndRemoveUntil(context,
-                            Navigation(user: MyAppState.currentUser!), false);
+                            NavigationController(user: MyAppState.currentUser!), false);
                         // pushAndRemoveUntil(context, ContainerScreen(user:  MyAppState.currentUser), false);
                       }
                     },
@@ -193,7 +192,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
 
                                 pushAndRemoveUntil(
                                     context,
-                                    Navigation(user: MyAppState.currentUser!),
+                                    NavigationController(user: MyAppState.currentUser!),
                                     false);
                               },
                               initialPosition: LatLng(-33.8567844, 151.213108),
@@ -228,7 +227,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                         //     ContainerScreen(user: MyAppState.currentUser),
                         //     false);
                         pushAndRemoveUntil(context,
-                            Navigation(user: MyAppState.currentUser!), false);
+                            NavigationController(user: MyAppState.currentUser!), false);
                       }
                     },
                   );
@@ -266,7 +265,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
 
                             pushAndRemoveUntil(
                                 context,
-                                Navigation(user: MyAppState.currentUser!),
+                                NavigationController(user: MyAppState.currentUser!),
                                 false);
                           }
                         });

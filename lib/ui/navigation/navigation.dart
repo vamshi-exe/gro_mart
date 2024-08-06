@@ -8,18 +8,18 @@ import 'package:gromart_customer/ui/home/HomeScreen.dart';
 import 'package:gromart_customer/ui/home/favourite_item.dart';
 import 'package:gromart_customer/ui/profile/ProfileScreen.dart';
 
-class Navigation extends StatefulWidget {
+class NavigationController extends StatefulWidget {
   final User user;
-  const Navigation({
+  const NavigationController({
     Key? key,
     required this.user,
   }) : super(key: key);
 
   @override
-  State<Navigation> createState() => _NavigationState();
+  State<NavigationController> createState() => _NavigationControllerState();
 }
 
-class _NavigationState extends State<Navigation> {
+class _NavigationControllerState extends State<NavigationController> {
   @override
   void initState() {
     super.initState();
