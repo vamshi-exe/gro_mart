@@ -283,7 +283,7 @@ class OnBoardingState extends State<OnBoarding> {
         pushReplacement(context, AuthScreen());
       }
     } else {
-      pushReplacement(context, OnBoardingScreen());
+      pushReplacement(context, AuthScreen());
     }
   }
 

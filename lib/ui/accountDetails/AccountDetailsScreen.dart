@@ -483,7 +483,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
           CircleAvatar(
             radius: 50,
             backgroundImage: NetworkImage(
-                'https://via.placeholder.com/150'), // Replace with actual image URL
+                'https://via.placeholder.com/150'),
           ),
           Positioned(
             bottom: 0,

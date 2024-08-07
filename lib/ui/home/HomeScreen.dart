@@ -547,53 +547,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? const Color(DARK_COLOR)
                                     : const Color(0xffFFFFFF),
                                 child: FutureBuilder<List<VendorCategoryModel>>(
-                                    future: fireStoreUtils.getCuisines(),
-                                    initialData: const [],
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Center(
-                                          child: CircularProgressIndicator
-                                              .adaptive(
-                                            valueColor: AlwaysStoppedAnimation(
-                                                Color(COLOR_PRIMARY)),
-                                          ),
-                                        );
-                                      }
+                                  future: fireStoreUtils.getCuisines(),
+                                  initialData: const [],
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child:
+                                            CircularProgressIndicator.adaptive(
+                                          valueColor: AlwaysStoppedAnimation(
+                                              Color(COLOR_PRIMARY)),
+                                        ),
+                                      );
+                                    }
 
-                                      if ((snapshot.hasData ||
-                                              (snapshot.data?.isNotEmpty ??
-                                                  false)) &&
-                                          mounted) {
-                                        return Container(
-                                            // height: 150,
-                                            child: Expanded(
-                                          child: GridView.builder(
-                                            shrinkWrap: true,
-                                            // scrollDirection:
-                                            //     Axis.horizontal,
-                                            itemCount: 6,
-                                            // snapshot.data!.length >= 8
-                                            //     ? 8
-                                            //     : snapshot
-                                            //         .data!.length,
-                                            itemBuilder: (context, index) {
-                                              return buildCategoryItem(
-                                                  snapshot.data![index]);
-                                            },
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 4,
-                                              childAspectRatio: 0.7,
-                                            ),
+                                    if ((snapshot.hasData ||
+                                            (snapshot.data?.isNotEmpty ??
+                                                false)) &&
+                                        mounted) {
+                                      return SizedBox(
+                                        height:
+                                            300, // Specify a height for the container
+                                        child: GridView.builder(
+                                          itemCount: 6,
+                                          itemBuilder: (context, index) {
+                                            return buildCategoryItem(
+                                                snapshot.data![index]);
+                                          },
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 4,
+                                            childAspectRatio: 0.7,
                                           ),
-                                        ));
-                                      } else {
-                                        return showEmptyState(
-                                            'No Categories'.tr(), context);
-                                      }
-                                    }),
+                                        ),
+                                      );
+                                    } else {
+                                      return showEmptyState(
+                                          'No Categories'.tr(), context);
+                                    }
+                                  },
+                                ),
                               ),
+
                               Visibility(
                                 visible: bannerTopHome.isNotEmpty,
                                 child: Container(

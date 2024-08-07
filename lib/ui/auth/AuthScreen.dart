@@ -3,8 +3,47 @@ import 'package:flutter/material.dart';
 import 'package:gromart_customer/constants.dart';
 import 'package:gromart_customer/services/helper.dart';
 import 'package:gromart_customer/ui/login/LoginScreen.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
+  @override
+  _AuthScreenState createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  final List<String> _titlesList = [
+    'Welcome to NCR SabjiWala',
+    'Fresh and Quality Products',
+    'Fast and Reliable Delivery',
+  ];
+
+  final List<String> _subtitlesList = [
+    'Order items from stores around you and track your order in real-time.',
+    'We provide the best quality products directly from the farms to your doorstep.',
+    'Get your products delivered fast and on time, every time.',
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onArrowPressed() {
+    if (_pageController.page == _titlesList.length - 1) {
+      // Navigate to LoginScreen when the last page is reached
+      pushAndRemoveUntil(context, LoginScreen(), false);
+    } else {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,165 +59,137 @@ class AuthScreen extends StatelessWidget {
                 'assets/images/delivery_guy.png',
                 fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.height * 0.47,
-                // height: 150,
               ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      right: 20.0, left: 20.0, top: 40, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        child: Text(
-                          'Skip',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(COLOR_ACCENT)),
-                        ).tr(),
-                        onPressed: () {
-                          pushAndRemoveUntil(context, LoginScreen(), false);
-                          // LocationPermission permission =
-                          //     await Geolocator.checkPermission();
-                          // if (permission == LocationPermission.always ||
-                          //     permission == LocationPermission.whileInUse) {
-                          //   if (MyAppState.selectedPosotion.location == null) {
-                          //     pushAndRemoveUntil(
-                          //         context, LocationPermissionScreen(), false);
-                          //   } else {
-                          //     pushAndRemoveUntil(
-                          //         context,
-                          //         ContainerScreen(
-                          //           user: null,
-                          //         ),
-                          //         false);
-                          //   }
-                          // } else {
-                          //   pushAndRemoveUntil(
-                          //       context, LocationPermissionScreen(), false);
-                          // }
-                        },
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: Color(COLOR_ACCENT)),
-                        child: Icon(
-                          Icons.arrow_forward_rounded,
-                          color: Colors.white,
+          PageView.builder(
+            controller: _pageController,
+            itemCount: _titlesList.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Stack(
+                children: [
+                  Positioned(
+                    bottom: 35,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                      child: CustomPaint(
+                        size:
+                            Size(MediaQuery.of(context).size.width * 0.89, 250),
+                        painter: BubblePainter(
+                          color: isDarkMode(context)
+                              ? AppColors.DARK_BG_COLOR
+                              : AppColors.WHITE_COLOR,
                         ),
-                      )
-                    ],
+                      ),
+                    ),
                   ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.73,
+                    left: 20,
+                    right: 20,
+                    child: Column(
+                      children: [
+                        Text(
+                          _titlesList[index],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color(COLOR_PRIMARY),
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold),
+                        ).tr(),
+                        SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            _subtitlesList[index],
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ).tr(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 48,
+                    left: MediaQuery.of(context).size.width / 2 - 25,
+                    child: GestureDetector(
+                      onTap: _onArrowPressed,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green,
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          Positioned(
+            bottom: 230,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: SmoothPageIndicator(
+                controller: _pageController,
+                count: _titlesList.length,
+                effect: ScrollingDotsEffect(
+                  activeDotColor: Color(COLOR_PRIMARY),
+                  dotColor: Colors.grey,
+                  dotHeight: 8.0,
+                  dotWidth: 8.0,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width * 0.89, 250),
-                  painter: BubblePainter(
-                    color: isDarkMode(context)
-                        ? AppColors.DARK_BG_COLOR
-                        : AppColors.WHITE_COLOR,
-                  ),
-                ),
-              )
-            ],
+            ),
           ),
-          // Column(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   crossAxisAlignment: CrossAxisAlignment.center,
-          // children: <Widget>[
-
-          // Padding(
-          //   padding: const EdgeInsets.only(
-          //       left: 16, top: 32, right: 16, bottom: 8),
-          //   child: Text(
-          //     "Welcome to NCR SabjiWala",
-          //     textAlign: TextAlign.center,
-          //     style: TextStyle(
-          //         color: Color(COLOR_PRIMARY),
-          //         fontSize: 24.0,
-          //         fontWeight: FontWeight.bold),
-          //   ).tr(),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-          //   child: Text(
-          //     "Order item from Store around you and track item in real-time",
-          //     style: TextStyle(fontSize: 18),
-          //     textAlign: TextAlign.center,
-          //   ).tr(),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.only(right: 40.0, left: 40.0, top: 40),
-          //   child: ConstrainedBox(
-          //     constraints: const BoxConstraints(minWidth: double.infinity),
-          //     child: ElevatedButton(
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Color(COLOR_PRIMARY),
-          //         padding: EdgeInsets.only(top: 12, bottom: 12),
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(25.0),
-          //           side: BorderSide(
-          //             color: Color(COLOR_PRIMARY),
-          //           ),
-          //         ),
-          //       ),
-          //       child: Text(
-          //         "Log In",
-          //         style: TextStyle(
-          //             fontSize: 20,
-          //             fontWeight: FontWeight.bold,
-          //             color: Colors.white),
-          //       ).tr(),
-          //       onPressed: () {
-          //         push(context, LoginScreen());
-          //       },
-          //     ),
-          //   ),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.only(
-          //       right: 40.0, left: 40.0, top: 20, bottom: 20),
-          //   child: ConstrainedBox(
-          //     constraints: const BoxConstraints(minWidth: double.infinity),
-          //     child: TextButton(
-          //       child: Text(
-          //         "Sign Up",
-          //         style: TextStyle(
-          //             fontSize: 20,
-          //             fontWeight: FontWeight.bold,
-          //             color: Color(COLOR_PRIMARY)),
-          //       ).tr(),
-          //       onPressed: () {
-          //         push(context, SignUpScreen());
-          //       },
-          //       style: ButtonStyle(
-          //         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          //           EdgeInsets.only(top: 12, bottom: 12),
-          //         ),
-          //         shape: MaterialStateProperty.all<OutlinedBorder>(
-          //           RoundedRectangleBorder(
-          //             borderRadius: BorderRadius.circular(25.0),
-          //             side: BorderSide(
-          //               color: Color(COLOR_PRIMARY),
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // )
-          //   ],
-          // ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  right: 20.0, left: 20.0, top: 40, bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text(
+                      'Skip',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(COLOR_ACCENT)),
+                    ).tr(),
+                    onPressed: () {
+                      pushAndRemoveUntil(context, LoginScreen(), false);
+                    },
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: Color(COLOR_ACCENT)),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -188,7 +199,8 @@ class AuthScreen extends StatelessWidget {
 class BubblePainter extends CustomPainter {
   final Color color;
 
-  BubblePainter({super.repaint, required this.color});
+  BubblePainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -203,7 +215,6 @@ class BubblePainter extends CustomPainter {
     final path = Path()
       ..moveTo(0, cornerRadius)
       ..quadraticBezierTo(0, 0, cornerRadius, 0)
-      // Create slanting top
       ..lineTo(size.width - cornerRadius, slopeHeight)
       ..quadraticBezierTo(
           size.width, slopeHeight, size.width, cornerRadius + slopeHeight)
@@ -221,34 +232,6 @@ class BubblePainter extends CustomPainter {
       ..close();
 
     canvas.drawPath(path, paint);
-
-    // Draw the green circle
-    final circlePaint = Paint()
-      ..color = Colors.green
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(size.width / 2, size.height - bubbleRadius),
-        bubbleRadius - 15, circlePaint);
-
-    // Draw the arrow
-    final arrowPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawLine(
-      Offset(size.width / 2 - 8, size.height - bubbleRadius),
-      Offset(size.width / 2 + 8, size.height - bubbleRadius),
-      arrowPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width / 2, size.height - bubbleRadius - 8),
-      Offset(size.width / 2 + 8, size.height - bubbleRadius),
-      arrowPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width / 2, size.height - bubbleRadius + 8),
-      Offset(size.width / 2 + 8, size.height - bubbleRadius),
-      arrowPaint,
-    );
   }
 
   @override
