@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gromart_customer/constants.dart';
 import 'package:gromart_customer/model/ProductModel.dart';
 import 'package:gromart_customer/model/VendorCategoryModel.dart';
@@ -288,23 +290,57 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
             thickness: 1,
           ),
         ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: productModel.length,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, inx) {
-            return productModel[inx].categoryID == category.id
-                ? buildRow(
-                    productModel[inx],
-                    veg,
-                    nonveg,
-                    productModel[inx].categoryID,
-                    (inx == (productModel.length - 1)))
-                : (isAnother == 0 && (inx == (productModel.length - 1)))
-                    ? showEmptyState("No item are available.".tr(), context)
-                    : Container();
-          },
+        // to be changed here
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 100,
+              child: ListView.builder(
+                // physics: AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                dragStartBehavior: DragStartBehavior.start,
+                shrinkWrap: true,
+                itemCount: 7,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      color: Colors.amber,
+                      height: 50,
+                      width: 50,
+                    ),
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: productModel.length,
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, inx) {
+                  return productModel[inx].categoryID == category.id
+                      ? buildRow(
+                          productModel[inx],
+                          veg,
+                          nonveg,
+                          productModel[inx].categoryID,
+                          (inx == (productModel.length - 1)))
+                      : (isAnother == 0 && (inx == (productModel.length - 1)))
+                          ? showEmptyState(
+                              "No item are available.".tr(), context)
+                          : Container();
+                },
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.7,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -372,7 +408,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
                   ),
           ],
         ),
-        child: Row(children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // StreamBuilder<List<CartProduct>>(
           //     stream: cartDatabase.watchProducts,
           //     initialData: [],
@@ -397,57 +433,100 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
           //       );
           //     }),
           Stack(children: [
-            CachedNetworkImage(
+            Center(
+              child: CachedNetworkImage(
                 height: 80,
                 width: 80,
                 imageUrl: getImageVAlidUrl(productModel.photo),
                 imageBuilder: (context, imageProvider) => Container(
-                      // width: 100,
-                      // height: 100,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          )),
-                    ),
+                  // width: 100,
+                  // height: 100,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      )),
+                ),
                 errorWidget: (context, url, error) => ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(
-                      placeholderImage,
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                    ))),
-            Positioned(
-              left: 5,
-              top: 5,
-              child: Icon(
-                Icons.circle,
-                color: productModel.veg == true
-                    ? const Color(0XFF3dae7d)
-                    : Colors.redAccent,
-                size: 13,
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.network(
+                    placeholderImage,
+                    fit: BoxFit.cover,
+                    // width: MediaQuery.of(context).size.width,
+                    // height: MediaQuery.of(context).size.height,
+                  ),
+                ),
               ),
-            )
+            ),
+            // Positioned(
+            //   // left: 5,
+            //   // top: 5,
+            //   child: Icon(
+            //     Icons.circle,
+            //     color: productModel.veg == true
+            //         ? const Color(0XFF3dae7d)
+            //         : Colors.redAccent,
+            //     size: 13,
+            //   ),
+            // )
           ]),
-          const SizedBox(
-            width: 10,
-          ),
+          // const SizedBox(
+          //   width: 10,
+          // ),
           Expanded(
               child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+              SizedBox(
+                height: 4,
+              ),
               Text(
                 productModel.name,
                 style: const TextStyle(
                     fontSize: 16, fontFamily: "Poppinssb", letterSpacing: 0.5),
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(
-                height: 5,
-              ),
+
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Colors.green,
+              //     borderRadius: BorderRadius.circular(5),
+              //   ),
+              //   child: Padding(
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              //     child: Row(
+              //       mainAxisSize: MainAxisSize.min,
+              //       children: [
+              //         Text(
+              //             productModel.reviewsCount != 0
+              //                 ? (productModel.reviewsSum /
+              //                         productModel.reviewsCount)
+              //                     .toStringAsFixed(1)
+              //                 : 0.toString(),
+              //             style: const TextStyle(
+              //               fontFamily: "Poppinsm",
+              //               letterSpacing: 0.5,
+              //               fontSize: 12,
+              //               color: Colors.white,
+              //             )),
+              //         const SizedBox(width: 3),
+              //         const Icon(
+              //           Icons.star,
+              //           size: 16,
+              //           color: Colors.white,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+            ],
+          )),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Row(
                 children: <Widget>[
                   productModel.disPrice == "" || productModel.disPrice == "0"
@@ -459,7 +538,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
                               letterSpacing: 0.5,
                               color: Color(COLOR_PRIMARY)),
                         )
-                      : Row(
+                      : Column(
                           children: [
                             Text(
                               "${amountShow(amount: productModel.disPrice.toString())}",
@@ -613,66 +692,25 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
                   //       )
                 ],
               ),
-              const SizedBox(
-                height: 5,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(5),
+              ElevatedButton(
+                onPressed: () async {
+                  await Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => ProductDetailsScreen(
+                              productModel: productModel,
+                              vendorModel: widget.vendorModel)))
+                      .whenComplete(() => setState(() {}));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(COLOR_ACCENT),
                 ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                          productModel.reviewsCount != 0
-                              ? (productModel.reviewsSum /
-                                      productModel.reviewsCount)
-                                  .toStringAsFixed(1)
-                              : 0.toString(),
-                          style: const TextStyle(
-                            fontFamily: "Poppinsm",
-                            letterSpacing: 0.5,
-                            fontSize: 12,
-                            color: Colors.white,
-                          )),
-                      const SizedBox(width: 3),
-                      const Icon(
-                        Icons.star,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
+                child: Text(
+                  'ADD'.tr(),
+                  style: TextStyle(
+                      fontFamily: "Poppinsm", color: AppColors.WHITE_COLOR),
                 ),
               ),
             ],
-          )),
-          TextButton.icon(
-            onPressed: () async {
-              await Navigator.of(context)
-                  .push(MaterialPageRoute(
-                      builder: (context) => ProductDetailsScreen(
-                          productModel: productModel,
-                          vendorModel: widget.vendorModel)))
-                  .whenComplete(() => setState(() {}));
-            },
-            icon: Icon(
-              Icons.add,
-              color: Color(COLOR_PRIMARY),
-              size: 16,
-            ),
-            label: Text(
-              'ADD'.tr(),
-              style: TextStyle(
-                  fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
-            ),
-            style: TextButton.styleFrom(
-              side: BorderSide(color: Colors.grey.shade300, width: 2),
-            ),
           )
         ]),
       ),

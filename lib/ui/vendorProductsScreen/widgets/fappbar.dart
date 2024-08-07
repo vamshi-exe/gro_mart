@@ -297,7 +297,7 @@ class FAppBar extends SliverAppBar {
                                 height: 10,
                               ),
                               Text(
-                                "${kilometer.toDouble().toStringAsFixed(currencyModel!.decimal)} km",
+                                "${kilometer.toDouble().toStringAsFixed(currencyModel.decimal)} km",
                                 style: const TextStyle(
                                     fontFamily: "Poppinsm",
                                     letterSpacing: 0.5,
@@ -693,7 +693,7 @@ class FAppBar extends SliverAppBar {
                       Container(
                         margin: const EdgeInsets.only(top: 3),
                         child: Text(
-                          "${offerList[index].discountType == "Fix Price" ? currencyModel!.symbol : ""}${offerList[index].discount}${offerList[index].discountType == "Percentage" ? "% OFF" : " OFF"}",
+                          "${offerList[index].discountType == "Fix Price" ? currencyModel.symbol : ""}${offerList[index].discount}${offerList[index].discountType == "Percentage" ? "% OFF" : " OFF"}",
                           style: const TextStyle(
                               color: Color(GREY_TEXT_COLOR),
                               fontWeight: FontWeight.bold,

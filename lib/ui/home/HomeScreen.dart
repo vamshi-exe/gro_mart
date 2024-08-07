@@ -565,20 +565,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                             (snapshot.data?.isNotEmpty ??
                                                 false)) &&
                                         mounted) {
-                                      return SizedBox(
-                                        height:
-                                            300, // Specify a height for the container
-                                        child: GridView.builder(
-                                          itemCount: 6,
-                                          itemBuilder: (context, index) {
-                                            return buildCategoryItem(
-                                                snapshot.data![index]);
-                                          },
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 4,
-                                            childAspectRatio: 0.7,
-                                          ),
+                                      return GridView.builder(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: 6,
+                                        itemBuilder: (context, index) {
+                                          return buildCategoryItem(
+                                              snapshot.data![index]);
+                                        },
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 4,
+                                          childAspectRatio: 0.7,
                                         ),
                                       );
                                     } else {
@@ -1752,10 +1750,10 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           push(
             context,
-            Categorydetailsscreen(
-                // category: model,
-                // isDineIn: false,
-                ),
+            CategoryDetailsScreen(
+              category: model,
+              isDineIn: false,
+            ),
           );
         },
         child: Container(
