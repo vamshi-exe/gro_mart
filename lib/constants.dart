@@ -209,11 +209,11 @@ String getKm(UserLocation pos1, UserLocation pos2) {
 
 String amountShow({required String? amount}) {
   if (currencyModel.symbolatright == true) {
-    // return "${double.parse(amount.toString())} ${currencyModel!.symbol.toString()}";
-    return "${double.parse(amount.toString()).toStringAsFixed(currencyModel.decimal)} ${currencyModel.symbol.toString()}";
+    return "${double.parse(amount.toString())} ${currencyModel.symbol.toString()}";
+    // return "${double.parse(amount.toString()).toStringAsFixed(currencyModel.decimal)} ${currencyModel.symbol.toString()}";
   } else {
-    // return "${currencyModel?.symbol.toString()} ${double.parse(amount.toString()).toStringAsFixed(currencyModel.decimal)}";
     return "${currencyModel.symbol.toString()} ${double.parse(amount.toString()).toStringAsFixed(currencyModel.decimal)}";
+    // return "${currencyModel.symbol.toString()} ${double.parse(amount.toString()).toStringAsFixed(currencyModel.decimal)}";
   }
 }
 

@@ -69,7 +69,10 @@ class _CartScreenState extends State<CartScreen> {
   String? selctedOrderTypeValue = "Delivery";
   bool isDeliverFound = false;
   var tipValue = 0.0;
-  bool isTipSelected = false, isTipSelected1 = false, isTipSelected2 = false, isTipSelected3 = false;
+  bool isTipSelected = false,
+      isTipSelected1 = false,
+      isTipSelected2 = false,
+      isTipSelected3 = false;
   TextEditingController _textFieldController = TextEditingController();
 
   late Map<String, dynamic>? adminCommission;
@@ -77,7 +80,6 @@ class _CartScreenState extends State<CartScreen> {
   Timestamp? scheduleTime;
 
   AddressModel addressModel = AddressModel();
-
 
   @override
   void initState() {
@@ -90,44 +92,69 @@ class _CartScreenState extends State<CartScreen> {
   getFoodType() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
-      selctedOrderTypeValue = sp.getString("foodType") == "" || sp.getString("foodType") == null ? "Delivery" : sp.getString("foodType");
+      selctedOrderTypeValue =
+          sp.getString("foodType") == "" || sp.getString("foodType") == null
+              ? "Delivery"
+              : sp.getString("foodType");
     });
   }
 
   Future<void> getDeliveyData() async {
     isDeliverFound = true;
-    await _fireStoreUtils.getVendorByVendorID(cartProducts.first.vendorID).then((value) {
+    await _fireStoreUtils
+        .getVendorByVendorID(cartProducts.first.vendorID)
+        .then((value) {
       vendorModel = value;
     });
     if (selctedOrderTypeValue == "Delivery") {
-      num km = num.parse(getKm(addressModel.location!, UserLocation(latitude: vendorModel!.latitude, longitude: vendorModel!.longitude)));
+      num km = num.parse(getKm(
+          addressModel.location!,
+          UserLocation(
+              latitude: vendorModel!.latitude,
+              longitude: vendorModel!.longitude)));
       _fireStoreUtils.getDeliveryCharges().then((value) {
         if (value != null) {
           DeliveryChargeModel deliveryChargeModel = value;
 
           if (!deliveryChargeModel.vendorCanModify) {
             if (km > deliveryChargeModel.minimumDeliveryChargesWithinKm) {
-              deliveryCharges = (km * deliveryChargeModel.deliveryChargesPerKm).toDouble().toString();
+              deliveryCharges = (km * deliveryChargeModel.deliveryChargesPerKm)
+                  .toDouble()
+                  .toString();
               setState(() {});
             } else {
-              deliveryCharges = deliveryChargeModel.minimumDeliveryCharges.toDouble().toString();
+              deliveryCharges = deliveryChargeModel.minimumDeliveryCharges
+                  .toDouble()
+                  .toString();
               setState(() {});
             }
           } else {
             if (vendorModel != null && vendorModel!.deliveryCharge != null) {
-              if (km > vendorModel!.deliveryCharge!.minimumDeliveryChargesWithinKm) {
-                deliveryCharges = (km * vendorModel!.deliveryCharge!.deliveryChargesPerKm).toDouble().toString();
+              if (km >
+                  vendorModel!.deliveryCharge!.minimumDeliveryChargesWithinKm) {
+                deliveryCharges =
+                    (km * vendorModel!.deliveryCharge!.deliveryChargesPerKm)
+                        .toDouble()
+                        .toString();
                 setState(() {});
               } else {
-                deliveryCharges = vendorModel!.deliveryCharge!.minimumDeliveryCharges.toDouble().toString();
+                deliveryCharges = vendorModel!
+                    .deliveryCharge!.minimumDeliveryCharges
+                    .toDouble()
+                    .toString();
                 setState(() {});
               }
             } else {
               if (km > deliveryChargeModel.minimumDeliveryChargesWithinKm) {
-                deliveryCharges = (km * deliveryChargeModel.deliveryChargesPerKm).toDouble().toString();
+                deliveryCharges =
+                    (km * deliveryChargeModel.deliveryChargesPerKm)
+                        .toDouble()
+                        .toString();
                 setState(() {});
               } else {
-                deliveryCharges = deliveryChargeModel.minimumDeliveryCharges.toDouble().toString();
+                deliveryCharges = deliveryChargeModel.minimumDeliveryCharges
+                    .toDouble()
+                    .toString();
                 setState(() {});
               }
             }
@@ -149,7 +176,8 @@ class _CartScreenState extends State<CartScreen> {
         setState(() {
           adminCommission = value;
           adminCommissionValue = adminCommission!["adminCommission"].toString();
-          addminCommissionType = adminCommission!["addminCommissionType"].toString();
+          addminCommissionType =
+              adminCommission!["addminCommissionType"].toString();
           isEnableAdminCommission = adminCommission!["isAdminCommission"];
         });
       }
@@ -162,7 +190,27 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     cartDatabase = Provider.of<CartDatabase>(context, listen: true);
     return Scaffold(
-      backgroundColor: isDarkMode(context) ? const Color(DARK_COLOR) : const Color(0xffFFFFFF),
+      appBar: AppBar(
+        title: Text(
+          'CheckOut',
+          style: const TextStyle(
+              fontFamily: "Poppinsl",
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 18),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+          ),
+        ),
+      ),
+      backgroundColor: isDarkMode(context)
+          ? const Color(DARK_COLOR)
+          : const Color(0xffFFFFFF),
       body: StreamBuilder<List<CartProduct>>(
         stream: cartDatabase.watchProducts,
         initialData: const [],
@@ -199,25 +247,29 @@ class _CartScreenState extends State<CartScreen> {
                           itemCount: cartProducts.length,
                           itemBuilder: (context, index) {
                             vendorID = cartProducts[index].vendorID;
-                            return Container(
-                              margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-                                color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-                                boxShadow: [
-                                  isDarkMode(context)
-                                      ? const BoxShadow()
-                                      : BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          blurRadius: 5,
-                                        ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  buildCartRow(cartProducts[index], lstExtras),
-                                ],
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                // margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
+                                // decoration: BoxDecoration(
+                                //   borderRadius: BorderRadius.circular(10),
+                                //   border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
+                                //   color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+                                //   boxShadow: [
+                                //     isDarkMode(context)
+                                //         ? const BoxShadow()
+                                //         : BoxShadow(
+                                //             color: Colors.grey.withOpacity(0.5),
+                                //             blurRadius: 5,
+                                //           ),
+                                //   ],
+                                // ),
+                                child: Column(
+                                  children: [
+                                    buildCartRow(
+                                        cartProducts[index], lstExtras),
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -227,11 +279,16 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                 ),
+                Divider(),
                 GestureDetector(
                   onTap: () {
                     txt.clear();
 
-                    Map<String, dynamic> specialDiscountMap = {'special_discount': specialDiscountAmount, 'special_discount_label': specialDiscount, 'specialType': specialType};
+                    Map<String, dynamic> specialDiscountMap = {
+                      'special_discount': specialDiscountAmount,
+                      'special_discount_label': specialDiscount,
+                      'specialType': specialType
+                    };
 
                     if (selctedOrderTypeValue == "Delivery") {
                       push(
@@ -240,12 +297,16 @@ class _CartScreenState extends State<CartScreen> {
                           total: grandtotal,
                           products: cartProducts,
                           discount: discountAmount,
-                          couponCode: couponModel != null ? couponModel!.offerCode : "",
+                          couponCode:
+                              couponModel != null ? couponModel!.offerCode : "",
                           notes: noteController.text,
-                          couponId: couponModel != null ? couponModel!.offerId : "",
+                          couponId:
+                              couponModel != null ? couponModel!.offerId : "",
                           extraAddons: commaSepratedAddOns,
                           tipValue: tipValue.toString(),
-                          takeAway: selctedOrderTypeValue == "Delivery" ? false : true,
+                          takeAway: selctedOrderTypeValue == "Delivery"
+                              ? false
+                              : true,
                           deliveryCharge: deliveryCharges,
                           taxModel: taxList,
                           specialDiscountMap: specialDiscountMap,
@@ -278,8 +339,10 @@ class _CartScreenState extends State<CartScreen> {
                         PaymentScreen(
                           total: grandtotal,
                           discount: discountAmount,
-                          couponCode: couponModel != null ? couponModel!.offerCode : "",
-                          couponId: couponModel != null ? couponModel!.offerId : "",
+                          couponCode:
+                              couponModel != null ? couponModel!.offerCode : "",
+                          couponId:
+                              couponModel != null ? couponModel!.offerId : "",
                           notes: noteController.text,
                           products: cartProducts,
                           extraAddons: commaSepratedAddOns,
@@ -297,32 +360,79 @@ class _CartScreenState extends State<CartScreen> {
                   },
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 1,
-                    height: MediaQuery.of(context).size.height * 0.080,
+                    height: MediaQuery.of(context).size.height * 0.1,
                     child: Container(
-                      color: Color(COLOR_PRIMARY),
-                      padding: const EdgeInsets.only(left: 15, right: 10, bottom: 8, top: 8),
+                      // color: Color(COLOR_PRIMARY),
+                      padding: const EdgeInsets.only(
+                          left: 15, right: 10, bottom: 8, top: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(children: [
-                            Text("Total : ".tr(),
-                                style: const TextStyle(
-                                  fontFamily: "Poppinsl",
-                                  color: Color(0xFFFFFFFF),
-                                )),
-                            Text(
-                              amountShow(amount: grandtotal.toString()),
-                              style: const TextStyle(
-                                fontFamily: "Poppinsm",
-                                color: Color(0xFFFFFFFF),
+                          // Row(
+                          //   children: [
+                          //     // Text(
+                          //     //   "Total : ".tr(),
+                          //     //   style: const TextStyle(
+                          //     //     fontFamily: "Poppinsl",
+                          //     //     color: Colors.black,
+                          //     //   ),
+                          //     // ),
+
+                          //   ],
+                          // ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Pay Using'),
+                                  Icon(Icons.arrow_drop_up_rounded),
+                                ],
+                              ),
+                              Text('VISA 0080'),
+                            ],
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.green,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 20),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    amountShow(amount: grandtotal.toString()),
+                                    style: const TextStyle(
+                                      fontFamily: "Poppinsm",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "PLACE ORDER".tr(),
+                                    style: const TextStyle(
+                                      fontFamily: "Poppinsm",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                  )
+                                ],
                               ),
                             ),
-                          ]),
-                          Text("PROCEED TO CHECKOUT".tr(),
-                              style: const TextStyle(
-                                fontFamily: "Poppinsm",
-                                color: Color(0xFFFFFFFF),
-                              )),
+                          ),
                         ],
                       ),
                     ),
@@ -350,13 +460,16 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     ProductModel? productModel;
-    FireStoreUtils().getProductByID(cartProduct.id.split('~').first).then((value) {
+    FireStoreUtils()
+        .getProductByID(cartProduct.id.split('~').first)
+        .then((value) {
       productModel = value;
     });
 
     VariantInfo? variantInfo;
     if (cartProduct.variant_info != null) {
-      variantInfo = VariantInfo.fromJson(jsonDecode(cartProduct.variant_info.toString()));
+      variantInfo =
+          VariantInfo.fromJson(jsonDecode(cartProduct.variant_info.toString()));
     }
     if (cartProduct.extras == null) {
       addOnVal.clear();
@@ -365,7 +478,11 @@ class _CartScreenState extends State<CartScreen> {
         if (cartProduct.extras == '[]') {
           addOnVal.clear();
         } else {
-          String extraDecode = cartProduct.extras.toString().replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "");
+          String extraDecode = cartProduct.extras
+              .toString()
+              .replaceAll("[", "")
+              .replaceAll("]", "")
+              .replaceAll("\"", "");
           if (extraDecode.contains(",")) {
             addOnVal = extraDecode.split(",");
           } else {
@@ -381,8 +498,11 @@ class _CartScreenState extends State<CartScreen> {
       }
     }
 
-    if (cartProduct.extras_price != null && cartProduct.extras_price != "" && double.parse(cartProduct.extras_price!) != 0.0) {
-      priceTotalValue += double.parse(cartProduct.extras_price!) * cartProduct.quantity;
+    if (cartProduct.extras_price != null &&
+        cartProduct.extras_price != "" &&
+        double.parse(cartProduct.extras_price!) != 0.0) {
+      priceTotalValue +=
+          double.parse(cartProduct.extras_price!) * cartProduct.quantity;
     }
     priceTotalValue += double.parse(cartProduct.price) * cartProduct.quantity;
 
@@ -434,11 +554,15 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Text(
                         cartProduct.name,
-                        style: const TextStyle(fontSize: 18, fontFamily: "Poppinsm"),
+                        style: const TextStyle(
+                            fontSize: 18, fontFamily: "Poppinsm"),
                       ),
                       Text(
                         amountShow(amount: priceTotalValue.toString()),
-                        style: TextStyle(fontSize: 20, fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "Poppinsm",
+                            color: Color(COLOR_PRIMARY)),
                       ),
                     ],
                   ),
@@ -472,28 +596,51 @@ class _CartScreenState extends State<CartScreen> {
                     GestureDetector(
                       onTap: () {
                         if (productModel!.itemAttributes != null) {
-                          if (productModel!.itemAttributes!.variants!.where((element) => element.variantSku == variantInfo!.variantSku).isNotEmpty) {
-                            if (int.parse(productModel!.itemAttributes!.variants!.where((element) => element.variantSku == variantInfo!.variantSku).first.variantQuantity.toString()) > quen ||
-                                int.parse(productModel!.itemAttributes!.variants!.where((element) => element.variantSku == variantInfo!.variantSku).first.variantQuantity.toString()) == -1) {
+                          if (productModel!.itemAttributes!.variants!
+                              .where((element) =>
+                                  element.variantSku == variantInfo!.variantSku)
+                              .isNotEmpty) {
+                            if (int.parse(productModel!
+                                        .itemAttributes!.variants!
+                                        .where((element) =>
+                                            element.variantSku ==
+                                            variantInfo!.variantSku)
+                                        .first
+                                        .variantQuantity
+                                        .toString()) >
+                                    quen ||
+                                int.parse(productModel!
+                                        .itemAttributes!.variants!
+                                        .where((element) =>
+                                            element.variantSku ==
+                                            variantInfo!.variantSku)
+                                        .first
+                                        .variantQuantity
+                                        .toString()) ==
+                                    -1) {
                               quen++;
                               addtocard(cartProduct, quen);
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
                                 content: Text("Item out of stock".tr()),
                               ));
                             }
                           } else {
-                            if (productModel!.quantity > quen || productModel!.quantity == -1) {
+                            if (productModel!.quantity > quen ||
+                                productModel!.quantity == -1) {
                               quen++;
                               addtocard(cartProduct, quen);
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
                                 content: Text("Item out of stock".tr()),
                               ));
                             }
                           }
                         } else {
-                          if (productModel!.quantity > quen || productModel!.quantity == -1) {
+                          if (productModel!.quantity > quen ||
+                              productModel!.quantity == -1) {
                             quen++;
                             addtocard(cartProduct, quen);
                           } else {
@@ -516,14 +663,17 @@ class _CartScreenState extends State<CartScreen> {
             variantInfo == null || variantInfo.variantOptions!.isEmpty
                 ? Container()
                 : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     child: Wrap(
                       spacing: 6.0,
                       runSpacing: 6.0,
                       children: List.generate(
                         variantInfo.variantOptions!.length,
                         (i) {
-                          return _buildChip("${variantInfo!.variantOptions!.keys.elementAt(i)} : ${variantInfo.variantOptions![variantInfo.variantOptions!.keys.elementAt(i)]}", i);
+                          return _buildChip(
+                              "${variantInfo!.variantOptions!.keys.elementAt(i)} : ${variantInfo.variantOptions![variantInfo.variantOptions!.keys.elementAt(i)]}",
+                              i);
                         },
                       ).toList(),
                     ),
@@ -572,7 +722,8 @@ class _CartScreenState extends State<CartScreen> {
     return currentDate.isAfter(startDate) && currentDate.isBefore(endDate);
   }
 
-  Widget buildTotalRow(List<CartProduct> data, List<AddAddonsDemo> lstExtras, String vendorID) {
+  Widget buildTotalRow(
+      List<CartProduct> data, List<AddAddonsDemo> lstExtras, String vendorID) {
     var _font = 16.00;
     subTotal = 0.00;
     grandtotal = 0;
@@ -586,7 +737,9 @@ class _CartScreenState extends State<CartScreen> {
           addOnValDoule = addOnValDoule + double.parse(addAddonsDemo.price!);
         }
       }
-      if (e.extras_price != null && e.extras_price != "" && double.parse(e.extras_price!) != 0.0) {
+      if (e.extras_price != null &&
+          e.extras_price != "" &&
+          double.parse(e.extras_price!) != 0.0) {
         subTotal += double.parse(e.extras_price!) * e.quantity;
       }
       subTotal += double.parse(e.price) * e.quantity;
@@ -595,8 +748,11 @@ class _CartScreenState extends State<CartScreen> {
     grandtotal = subTotal + double.parse(deliveryCharges) + tipValue;
 
     if (couponModel != null) {
-      discountAmount = calculateDiscount(amount: subTotal.toString(), offerModel: couponModel);
-      grandtotal = grandtotal - calculateDiscount(amount: subTotal.toString(), offerModel: couponModel);
+      discountAmount = calculateDiscount(
+          amount: subTotal.toString(), offerModel: couponModel);
+      grandtotal = grandtotal -
+          calculateDiscount(
+              amount: subTotal.toString(), offerModel: couponModel);
     }
 
     if (vendorModel != null) {
@@ -609,8 +765,10 @@ class _CartScreenState extends State<CartScreen> {
             if (element.timeslot!.isNotEmpty) {
               element.timeslot!.forEach((element) {
                 if (element.discountType == "delivery") {
-                  var start = DateFormat("dd-MM-yyyy HH:mm").parse(date + " " + element.from.toString());
-                  var end = DateFormat("dd-MM-yyyy HH:mm").parse(date + " " + element.to.toString());
+                  var start = DateFormat("dd-MM-yyyy HH:mm")
+                      .parse(date + " " + element.from.toString());
+                  var end = DateFormat("dd-MM-yyyy HH:mm")
+                      .parse(date + " " + element.to.toString());
                   if (isCurrentDateInRange(start, end)) {
                     specialDiscount = double.parse(element.discount.toString());
                     specialType = element.type.toString();
@@ -634,7 +792,12 @@ class _CartScreenState extends State<CartScreen> {
     String taxAmount = " 0.0";
     if (taxList != null) {
       for (var element in taxList!) {
-        taxAmount = (double.parse(taxAmount) + calculateTax(amount: (subTotal - discountAmount - specialDiscountAmount).toString(), taxModel: element)).toString();
+        taxAmount = (double.parse(taxAmount) +
+                calculateTax(
+                    amount: (subTotal - discountAmount - specialDiscountAmount)
+                        .toString(),
+                    taxModel: element))
+            .toString();
       }
     }
 
@@ -642,263 +805,287 @@ class _CartScreenState extends State<CartScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-              boxShadow: [
-                isDarkMode(context)
-                    ? const BoxShadow()
-                    : BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        blurRadius: 5,
+        GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+                isScrollControlled: true,
+                isDismissible: true,
+                context: context,
+                backgroundColor: Colors.transparent,
+                enableDrag: true,
+                builder: (BuildContext context) => sheet());
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              // padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              // margin:
+              //     const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
+              // decoration: BoxDecoration(
+              //   borderRadius: BorderRadius.circular(10),
+              //   border: Border.all(
+              //       color: isDarkMode(context)
+              //           ? const Color(DarkContainerBorderColor)
+              //           : Colors.grey.shade100,
+              //       width: 1),
+              //   color: isDarkMode(context)
+              //       ? const Color(DarkContainerColor)
+              //       : Colors.white,
+              //   boxShadow: [
+              //     isDarkMode(context)
+              //         ? const BoxShadow()
+              //         : BoxShadow(
+              //             color: Colors.grey.withOpacity(0.5),
+              //             blurRadius: 5,
+              //           ),
+              //   ],
+              // ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Image(
+                        image: AssetImage("assets/images/reedem.png"),
+                        width: 40,
                       ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(children: [
-                  const Image(
-                    image: AssetImage("assets/images/reedem.png"),
-                    width: 50,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Redeem Coupon".tr(),
-                          style: const TextStyle(
-                            fontFamily: "Poppinsm",
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Column(
+                          children: [
+                            // Text(
+                            //   "Redeem Coupon".tr(),
+                            //   style: const TextStyle(
+                            //     fontFamily: "Poppinsm",
+                            //   ),
+                            // ),
+                            Text("Add coupon code".tr(),
+                                style: const TextStyle(
+                                  fontFamily: "Poppinsr",
+                                )),
+                          ],
                         ),
-                        Text("Add coupon code".tr(),
-                            style: const TextStyle(
-                              fontFamily: "Poppinsr",
-                            )),
-                      ],
-                    ),
+                      )
+                    ],
+                  ),
+                  GestureDetector(
+                    // onTap: () {
+                    //   showModalBottomSheet(
+                    //       isScrollControlled: true,
+                    //       isDismissible: true,
+                    //       context: context,
+                    //       backgroundColor: Colors.transparent,
+                    //       enableDrag: true,
+                    //       builder: (BuildContext context) => sheet());
+                    // },
+                    // child: const Image(
+                    //     image: AssetImage("assets/images/add.png"), width: 40),
+                    child: Icon(Icons.arrow_forward_ios),
                   )
-                ]),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        isScrollControlled: true, isDismissible: true, context: context, backgroundColor: Colors.transparent, enableDrag: true, builder: (BuildContext context) => sheet());
-                  },
-                  child: const Image(image: AssetImage("assets/images/add.png"), width: 40),
-                )
-              ],
-            )),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Divider(),
+        // Container(
+        //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        //   margin:
+        //       const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
+        //   // decoration: BoxDecoration(
+        //   //   borderRadius: BorderRadius.circular(10),
+        //   //   border: Border.all(
+        //   //       color: isDarkMode(context)
+        //   //           ? const Color(DarkContainerBorderColor)
+        //   //           : Colors.grey.shade100,
+        //   //       width: 1),
+        //   //   color: isDarkMode(context)
+        //   //       ? const Color(DarkContainerColor)
+        //   //       : Colors.white,
+        //   //   boxShadow: [
+        //   //     isDarkMode(context)
+        //   //         ? const BoxShadow()
+        //   //         : BoxShadow(
+        //   //             color: Colors.grey.withOpacity(0.5),
+        //   //             blurRadius: 5,
+        //   //           ),
+        //   //   ],
+        //   // ),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Text(
+        //             "Schedule Order".tr(),
+        //             style: const TextStyle(
+        //               fontFamily: "Poppinsm",
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       GestureDetector(
+        //         onTap: () {
+        //           // BottomPicker.dateTime(
+        //           //   // titleStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        //           //   onSubmit: (index) {
+        //           //     setState(() {
+        //           //       DateTime dateAndTime = index;
+        //           //       scheduleTime = Timestamp.fromDate(dateAndTime);
+        //           //     });
+        //           //   },
+        //           //   minDateTime: DateTime.now(),
+        //           //   // displayButtonIcon: false,
+        //           //   displaySubmitButton: true,
+        //           //   // title: '',
+        //           //   // buttonText: 'Confirm',
+        //           //   // buttonSingleColor: Color(COLOR_PRIMARY),
+        //           //   // buttonTextStyle: const TextStyle(color: Colors.white), pickerTitle: null,
+        //           // ).show(context);
+        //         },
+        //         child: Text(
+        //           scheduleTime == null
+        //               ? "Select".tr()
+        //               : DateFormat("EEE dd MMMM , HH:mm aa")
+        //                   .format(scheduleTime!.toDate()),
+        //           style: TextStyle(
+        //               fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
+        //         ),
+        //       )
+        //     ],
+        //   ),
+        // ),
 
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-              boxShadow: [
-                isDarkMode(context)
-                    ? const BoxShadow()
-                    : BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  blurRadius: 5,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // margin:
+          //     const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
+          // decoration: BoxDecoration(
+          //   borderRadius: BorderRadius.circular(10),
+          //   border: Border.all(
+          //       color: isDarkMode(context)
+          //           ? const Color(DarkContainerBorderColor)
+          //           : Colors.grey.shade100,
+          //       width: 1),
+          //   color: isDarkMode(context)
+          //       ? const Color(DarkContainerColor)
+          //       : Colors.white,
+          //   boxShadow: [
+          //     isDarkMode(context)
+          //         ? const BoxShadow()
+          //         : BoxShadow(
+          //             color: Colors.grey.withOpacity(0.5),
+          //             blurRadius: 5,
+          //           ),
+          //   ],
+          // ),
+          child: Column(
+            children: [
+              // Container(
+              //   padding:
+              //       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text(
+              //         "Delivery Option: ".tr(),
+              //         style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
+              //       ),
+              //       Text(
+              //         selctedOrderTypeValue == "Delivery"
+              //             ? "Delivery (${amountShow(amount: deliveryCharges.toString())})"
+              //             : selctedOrderTypeValue! + " (Free)",
+              //         style: TextStyle(
+              //             fontFamily: "Poppinsm",
+              //             color: isDarkMode(context)
+              //                 ? const Color(0xffFFFFFF)
+              //                 : const Color(0xff333333),
+              //             fontSize:
+              //                 selctedOrderTypeValue == "Delivery" ? _font : 14),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const Divider(
+              //   color: Color(0xffE2E8F0),
+              //   height: 0.1,
+              // ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Schedule Order".tr(),
-                      style: const TextStyle(
-                        fontFamily: "Poppinsm",
-                      ),
+                      "Item Total".tr(),
+                      style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
+                    ),
+                    Text(
+                      amountShow(amount: subTotal.toString()),
+                      style: TextStyle(
+                          fontFamily: "Poppinsm",
+                          color: isDarkMode(context)
+                              ? const Color(0xffFFFFFF)
+                              : const Color(0xff333333),
+                          fontSize: _font),
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () {
-                    // BottomPicker.dateTime(
-                    //   // titleStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                    //   onSubmit: (index) {
-                    //     setState(() {
-                    //       DateTime dateAndTime = index;
-                    //       scheduleTime = Timestamp.fromDate(dateAndTime);
-                    //     });
-                    //   },
-                    //   minDateTime: DateTime.now(),
-                    //   // displayButtonIcon: false,
-                    //   displaySubmitButton: true,
-                    //   // title: '',
-                    //   // buttonText: 'Confirm',
-                    //   // buttonSingleColor: Color(COLOR_PRIMARY),
-                    //   // buttonTextStyle: const TextStyle(color: Colors.white), pickerTitle: null,
-                    // ).show(context);
-                  },
-                  child: Text(
-                    scheduleTime == null ? "Select".tr() : DateFormat("EEE dd MMMM , HH:mm aa").format(scheduleTime!.toDate()),
-                    style: TextStyle(fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
-                  ),
-                )
-              ],
-            )),
-        selctedOrderTypeValue == "Delivery"?Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-              boxShadow: [
-                isDarkMode(context)
-                    ? const BoxShadow()
-                    : BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  blurRadius: 5,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Address".tr(),
-                        style: const TextStyle(
-                          fontFamily: "Poppinsm",
-                          fontWeight: FontWeight.w700
-                        ),
-                      ),
-                      SizedBox(height: 5,),
-                      Text(
-                        addressModel.getFullAddress(),
-                        style: const TextStyle(
-                          fontFamily: "Poppinsm",
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 5,),
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeliveryAddressScreen())).then((value) {
-                      addressModel = value;
-                      getDeliveyData();
-                      setState(() {});
-                    });
-                  },
-                  child: Text(
-                    "Change",
-                    style: TextStyle(fontFamily: "Poppinsm", color: Color(COLOR_PRIMARY)),
-                  ),
-                )
-              ],
-            )):SizedBox(),
-
-        Container(
-          margin: const EdgeInsets.only(left: 13, top: 13, right: 13, bottom: 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-            color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-            boxShadow: [
-              isDarkMode(context)
-                  ? const BoxShadow()
-                  : BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      blurRadius: 5,
+              ),
+              // const Divider(
+              //   thickness: 1,
+              // ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Discount".tr(),
+                      style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
                     ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Delivery Option: ".tr(),
-                        style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
-                      ),
-                      Text(
-                        selctedOrderTypeValue == "Delivery" ? "Delivery (${amountShow(amount: deliveryCharges.toString())})" : selctedOrderTypeValue! + " (Free)",
-                        style: TextStyle(
-                            fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: selctedOrderTypeValue == "Delivery" ? _font : 14),
-                      ),
-                    ],
-                  )),
-              const Divider(
-                color: Color(0xffE2E8F0),
-                height: 0.1,
+                    Text(
+                      "${couponModel == null ? amountShow(amount: "0.0") : amountShow(amount: discountAmount.toString())}",
+                      style: TextStyle(
+                          fontFamily: "Poppinsm",
+                          color: Colors.black,
+                          fontSize: _font),
+                    ),
+                  ],
+                ),
               ),
-              Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Subtotal".tr(),
-                        style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
-                      ),
-                      Text(
-                        amountShow(amount: subTotal.toString()),
-                        style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
-                      ),
-                    ],
-                  )),
-              const Divider(
-                thickness: 1,
-              ),
-              Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Discount".tr(),
-                        style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
-                      ),
-                      Text(
-                        "(-${couponModel == null ? amountShow(amount: "0.0") : amountShow(amount: discountAmount.toString())})",
-                        style: TextStyle(fontFamily: "Poppinsm", color: Colors.red, fontSize: _font),
-                      ),
-                    ],
-                  )),
-              const Divider(
-                thickness: 1,
-              ),
+              // const Divider(
+              //   thickness: 1,
+              // ),
               Visibility(
-                visible: vendorModel != null ? vendorModel!.specialDiscountEnable : false,
+                visible: vendorModel != null
+                    ? vendorModel!.specialDiscountEnable
+                    : false,
                 child: Column(
                   children: [
                     Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Special Discount".tr() + "($specialDiscount ${specialType == "amount" ? currencyModel!.symbol : "%"})",
-                              style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
-                            ),
-                            Text(
-                              "(-${amountShow(amount: specialDiscountAmount.toString())})",
-                              style: TextStyle(fontFamily: "Poppinsm", color: Colors.red, fontSize: _font),
-                            ),
-                          ],
-                        )),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Special Discount".tr() +
+                                "($specialDiscount ${specialType == "amount" ? currencyModel!.symbol : "%"})",
+                            style: TextStyle(
+                                fontFamily: "Poppinsm", fontSize: _font),
+                          ),
+                          Text(
+                            "(-${amountShow(amount: specialDiscountAmount.toString())})",
+                            style: TextStyle(
+                                fontFamily: "Poppinsm",
+                                color: Colors.black,
+                                fontSize: _font),
+                          ),
+                        ],
+                      ),
+                    ),
                     const Divider(
                       thickness: 1,
                     ),
@@ -907,25 +1094,45 @@ class _CartScreenState extends State<CartScreen> {
               ),
 
               selctedOrderTypeValue == "Delivery"
-                  ? (widget.fromContainer && !isDeliverFound && addressModel.location!.latitude == 0.0 && addressModel.location!.longitude == 0)
+                  ? (widget.fromContainer &&
+                          !isDeliverFound &&
+                          addressModel.location!.latitude == 0.0 &&
+                          addressModel.location!.longitude == 0)
                       ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          child: Text("Delivery Charge Will Applied Next Step.".tr(), style: TextStyle(fontFamily: "Poppinsm", fontSize: _font)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
+                          child: Text(
+                              "Delivery Charge Will Applied Next Step.".tr(),
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm", fontSize: _font)),
                         )
                       : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 5,
+                          ),
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Delivery Charges".tr(),
-                                    style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
+                                    style: TextStyle(
+                                      fontFamily: "Poppinsm",
+                                      fontSize: _font,
+                                      color: Colors.green,
+                                    ),
                                   ),
                                   Text(
-                                    amountShow(amount: deliveryCharges.toString()),
-                                    style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
+                                    amountShow(
+                                        amount: deliveryCharges.toString()),
+                                    style: TextStyle(
+                                      fontFamily: "Poppinsm",
+                                      color: Colors.green,
+                                      fontSize: _font,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -933,7 +1140,8 @@ class _CartScreenState extends State<CartScreen> {
                                 thickness: 1,
                               ),
                             ],
-                          ))
+                          ),
+                        )
                   : Container(),
 
               ListView.builder(
@@ -945,18 +1153,34 @@ class _CartScreenState extends State<CartScreen> {
                   return Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 "${taxModel.title.toString()} (${taxModel.type == "fix" ? amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
-                                style: TextStyle(fontFamily: "Poppinsm", fontSize: _font),
+                                style: TextStyle(
+                                    fontFamily: "Poppinsm", fontSize: _font),
                               ),
                             ),
                             Text(
-                              amountShow(amount: calculateTax(amount: (double.parse(subTotal.toString()) - discountAmount - specialDiscountAmount).toString(), taxModel: taxModel).toString()),
-                              style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
+                              amountShow(
+                                  amount: calculateTax(
+                                          amount: (double.parse(
+                                                      subTotal.toString()) -
+                                                  discountAmount -
+                                                  specialDiscountAmount)
+                                              .toString(),
+                                          taxModel: taxModel)
+                                      .toString()),
+                              style: TextStyle(
+                                fontFamily: "Poppinsm",
+                                color: isDarkMode(context)
+                                    ? const Color(0xffFFFFFF)
+                                    : const Color(0xff333333),
+                                fontSize: _font,
+                              ),
                             ),
                           ],
                         ),
@@ -987,261 +1211,420 @@ class _CartScreenState extends State<CartScreen> {
               //         ))
               //     : Container(),
               Visibility(
-                  visible: ((tipValue) > 0),
-                  child: Column(
-                    children: [
-                      Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Tip amount".tr(),
-                                style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
-                              ),
-                              Text(
-                                '${amountShow(amount: tipValue.toString())}',
-                                style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
-                              ),
-                            ],
-                          )),
-                      const Divider(
-                        thickness: 1,
-                      ),
-                    ],
-                  )),
+                visible: ((tipValue) > 0),
+                child: Column(
+                  children: [
+                    Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Tip amount".tr(),
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
+                                  fontSize: _font),
+                            ),
+                            Text(
+                              '${amountShow(amount: tipValue.toString())}',
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  color: isDarkMode(context)
+                                      ? const Color(0xffFFFFFF)
+                                      : const Color(0xff333333),
+                                  fontSize: _font),
+                            ),
+                          ],
+                        )),
+                    const Divider(
+                      thickness: 1,
+                    ),
+                  ],
+                ),
+              ),
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Order Total".tr(),
-                        style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Order Total".tr(),
+                      style: TextStyle(
+                          fontFamily: "Poppinsm",
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode(context)
+                              ? const Color(0xffFFFFFF)
+                              : const Color(0xff333333),
+                          fontSize: _font),
+                    ),
+                    Text(
+                      amountShow(amount: grandtotal.toString()),
+                      style: TextStyle(
+                          fontFamily: "Poppinsm",
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode(context)
+                              ? const Color(0xffFFFFFF)
+                              : const Color(0xff333333),
+                          fontSize: _font),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              selctedOrderTypeValue == "Delivery"
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 5,
                       ),
-                      Text(
-                        amountShow(amount: grandtotal.toString()),
-                        style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: _font),
+                      // margin: const EdgeInsets.only(
+                      //   left: 13,
+                      //   top: 13,
+                      //   right: 13,
+                      //   bottom: 5,
+                      // ),
+                      // decoration: BoxDecoration(
+                      //   borderRadius: BorderRadius.circular(10),
+                      //   border: Border.all(
+                      //       color: isDarkMode(context)
+                      //           ? const Color(DarkContainerBorderColor)
+                      //           : Colors.grey.shade100,
+                      //       width: 1),
+                      //   color: isDarkMode(context)
+                      //       ? const Color(DarkContainerColor)
+                      //       : Colors.white,
+                      //   boxShadow: [
+                      //     isDarkMode(context)
+                      //         ? const BoxShadow()
+                      //         : BoxShadow(
+                      //             color: Colors.grey.withOpacity(0.5),
+                      //             blurRadius: 5,
+                      //           ),
+                      //   ],
+                      // ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Delivering to Home".tr(),
+                                  style: const TextStyle(
+                                    fontFamily: "Poppinsm",
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  addressModel.getFullAddress(),
+                                  style: const TextStyle(
+                                    fontFamily: "Poppinsm",
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              await Navigator.of(context)
+                                  .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          DeliveryAddressScreen()))
+                                  .then((value) {
+                                addressModel = value;
+                                getDeliveyData();
+                                setState(() {});
+                              });
+                            },
+                            child: Text(
+                              "Change",
+                              style: TextStyle(
+                                fontFamily: "Poppinsm",
+                                color: Color(COLOR_PRIMARY),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    ],
-                  )),
+                    )
+                  : SizedBox(),
             ],
           ),
         ),
+        // selctedOrderTypeValue == "Delivery"
+        //     ? Container(
+        //         padding:
+        //             const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: [
+        //             Text(
+        //               "Tip your delivery partner".tr(),
+        //               textAlign: TextAlign.start,
+        //               style: TextStyle(
+        //                   fontFamily: "Poppinsm",
+        //                   fontWeight: FontWeight.bold,
+        //                   color: isDarkMode(context)
+        //                       ? const Color(0xffFFFFFF)
+        //                       : const Color(0xff333333),
+        //                   fontSize: 15),
+        //             ),
+        //             Text(
+        //               "100% of the tip will go to your delivery partner".tr(),
+        //               style: const TextStyle(
+        //                   fontFamily: "Poppinsm",
+        //                   color: Color(0xff9091A4),
+        //                   fontSize: 14),
+        //             ),
+        //             const SizedBox(
+        //               height: 15,
+        //             ),
+        //             Row(
+        //               children: [
+        //                 GestureDetector(
+        //                   onTap: () {
+        //                     setState(() {
+        //                       if (isTipSelected) {
+        //                         isTipSelected = false;
+        //                         tipValue = 0;
+        //                       } else {
+        //                         tipValue = 10;
+        //                         isTipSelected = true;
+        //                       }
 
+        //                       isTipSelected1 = false;
+        //                       isTipSelected2 = false;
+        //                       isTipSelected3 = false;
+        //                     });
+        //                   },
+        //                   child: Container(
+        //                     margin: const EdgeInsets.only(right: 5),
+        //                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        //                     decoration: BoxDecoration(
+        //                       color: tipValue == 10 && isTipSelected
+        //                           ? Color(COLOR_PRIMARY)
+        //                           : isDarkMode(context)
+        //                               ? const Color(DARK_COLOR)
+        //                               : const Color(0xffFFFFFF),
+        //                       borderRadius: BorderRadius.circular(8),
+        //                       border: Border.all(
+        //                           color: const Color(0xff9091A4), width: 1),
+        //                     ),
+        //                     child: Center(
+        //                         child: Text(
+        //                       amountShow(amount: "10"),
+        //                       style: TextStyle(
+        //                           fontFamily: "Poppinsm",
+        //                           color: isDarkMode(context)
+        //                               ? const Color(0xffFFFFFF)
+        //                               : const Color(0xff333333),
+        //                           fontSize: 14),
+        //                     )),
+        //                   ),
+        //                 ),
+        //                 GestureDetector(
+        //                   onTap: () {
+        //                     setState(() {
+        //                       if (isTipSelected1) {
+        //                         isTipSelected1 = false;
+        //                         tipValue = 0;
+        //                       } else {
+        //                         tipValue = 20;
+        //                         isTipSelected1 = true;
+        //                       }
+        //                       isTipSelected = false;
+        //                       isTipSelected2 = false;
+        //                       isTipSelected3 = false;
+        //                     });
+        //                   },
+        //                   child: Container(
+        //                     margin: const EdgeInsets.only(right: 5),
+        //                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        //                     decoration: BoxDecoration(
+        //                       color: tipValue == 20 && isTipSelected1
+        //                           ? Color(COLOR_PRIMARY)
+        //                           : isDarkMode(context)
+        //                               ? const Color(DARK_COLOR)
+        //                               : const Color(0xffFFFFFF),
+        //                       borderRadius: BorderRadius.circular(8),
+        //                       border: Border.all(
+        //                           color: const Color(0xff9091A4), width: 1),
+        //                     ),
+        //                     child: Center(
+        //                         child: Text(
+        //                       amountShow(amount: "20"),
+        //                       style: TextStyle(
+        //                           fontFamily: "Poppinsm",
+        //                           color: isDarkMode(context)
+        //                               ? const Color(0xffFFFFFF)
+        //                               : const Color(0xff333333),
+        //                           fontSize: 14),
+        //                     )),
+        //                   ),
+        //                 ),
+        //                 GestureDetector(
+        //                   onTap: () {
+        //                     setState(() {
+        //                       if (isTipSelected2) {
+        //                         isTipSelected2 = false;
+        //                         tipValue = 0;
+        //                       } else {
+        //                         tipValue = 30;
+        //                         isTipSelected2 = true;
+        //                       }
 
-        selctedOrderTypeValue == "Delivery"
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Tip your delivery partner".tr(),
-                      textAlign: TextAlign.start,
-                      style: TextStyle(fontFamily: "Poppinsm", fontWeight: FontWeight.bold, color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: 15),
-                    ),
-                    Text(
-                      "100% of the tip will go to your delivery partner".tr(),
-                      style: const TextStyle(fontFamily: "Poppinsm", color: Color(0xff9091A4), fontSize: 14),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isTipSelected) {
-                                isTipSelected = false;
-                                tipValue = 0;
-                              } else {
-                                tipValue = 10;
-                                isTipSelected = true;
-                              }
+        //                       isTipSelected = false;
+        //                       isTipSelected1 = false;
 
-                              isTipSelected1 = false;
-                              isTipSelected2 = false;
-                              isTipSelected3 = false;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 5),
-                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                            decoration: BoxDecoration(
-                              color: tipValue == 10 && isTipSelected
-                                  ? Color(COLOR_PRIMARY)
-                                  : isDarkMode(context)
-                                      ? const Color(DARK_COLOR)
-                                      : const Color(0xffFFFFFF),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
-                            ),
-                            child: Center(
-                                child: Text(
-                              amountShow(amount: "10"),
-                              style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: 14),
-                            )),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isTipSelected1) {
-                                isTipSelected1 = false;
-                                tipValue = 0;
-                              } else {
-                                tipValue = 20;
-                                isTipSelected1 = true;
-                              }
-                              isTipSelected = false;
-                              isTipSelected2 = false;
-                              isTipSelected3 = false;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 5),
-                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                            decoration: BoxDecoration(
-                              color: tipValue == 20 && isTipSelected1
-                                  ? Color(COLOR_PRIMARY)
-                                  : isDarkMode(context)
-                                      ? const Color(DARK_COLOR)
-                                      : const Color(0xffFFFFFF),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
-                            ),
-                            child: Center(
-                                child: Text(
-                              amountShow(amount: "20"),
-                              style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: 14),
-                            )),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isTipSelected2) {
-                                isTipSelected2 = false;
-                                tipValue = 0;
-                              } else {
-                                tipValue = 30;
-                                isTipSelected2 = true;
-                              }
-
-                              isTipSelected = false;
-                              isTipSelected1 = false;
-
-                              isTipSelected3 = false;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 5),
-                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                            decoration: BoxDecoration(
-                              color: tipValue == 30 && isTipSelected2
-                                  ? Color(COLOR_PRIMARY)
-                                  : isDarkMode(context)
-                                      ? const Color(DARK_COLOR)
-                                      : const Color(0xffFFFFFF),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xff9091A4), width: 1),
-                            ),
-                            child: Center(
-                                child: Text(
-                              amountShow(amount: "30"),
-                              style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: 14),
-                            )),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              if (isTipSelected3) {
-                                setState(() {
-                                  if (isTipSelected3) {
-                                    isTipSelected3 = false;
-                                    tipValue = 0;
-                                  }
-                                  isTipSelected = false;
-                                  isTipSelected1 = false;
-                                  isTipSelected2 = false;
-                                  // grandtotal += tipValue;
-                                });
-                              } else {
-                                _displayDialog(context);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                              decoration: BoxDecoration(
-                                color: isTipSelected3
-                                    ? Color(COLOR_PRIMARY)
-                                    : isDarkMode(context)
-                                        ? const Color(DARK_COLOR)
-                                        : const Color(0xffFFFFFF),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xff9091A4), width: 1),
-                              ),
-                              child: Center(
-                                  child: Text(
-                                "Other".tr(),
-                                style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? const Color(0xffFFFFFF) : const Color(0xff333333), fontSize: 14),
-                              )),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              )
-            : Container(),
-
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            margin: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
-              boxShadow: [
-                isDarkMode(context)
-                    ? const BoxShadow()
-                    : BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  blurRadius: 5,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Remarks".tr(),
-                      style: const TextStyle(
-                        fontFamily: "Poppinsm",
-                      ),
-                    ),
-                    Text("Write remarks for store".tr(),
-                        style: const TextStyle(
-                          fontFamily: "Poppinsr",
-                        )),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        isScrollControlled: true, isDismissible: true, context: context, backgroundColor: Colors.transparent, enableDrag: true, builder: (BuildContext context) => noteSheet());
-                  },
-                  child: const Image(image: AssetImage("assets/images/add.png"), width: 40),
-                )
-              ],
-            )),
+        //                       isTipSelected3 = false;
+        //                     });
+        //                   },
+        //                   child: Container(
+        //                     margin: const EdgeInsets.only(right: 5),
+        //                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        //                     decoration: BoxDecoration(
+        //                       color: tipValue == 30 && isTipSelected2
+        //                           ? Color(COLOR_PRIMARY)
+        //                           : isDarkMode(context)
+        //                               ? const Color(DARK_COLOR)
+        //                               : const Color(0xffFFFFFF),
+        //                       borderRadius: BorderRadius.circular(8),
+        //                       border: Border.all(
+        //                           color: const Color(0xff9091A4), width: 1),
+        //                     ),
+        //                     child: Center(
+        //                         child: Text(
+        //                       amountShow(amount: "30"),
+        //                       style: TextStyle(
+        //                           fontFamily: "Poppinsm",
+        //                           color: isDarkMode(context)
+        //                               ? const Color(0xffFFFFFF)
+        //                               : const Color(0xff333333),
+        //                           fontSize: 14),
+        //                     )),
+        //                   ),
+        //                 ),
+        //                 Expanded(
+        //                   child: GestureDetector(
+        //                     onTap: () {
+        //                       if (isTipSelected3) {
+        //                         setState(() {
+        //                           if (isTipSelected3) {
+        //                             isTipSelected3 = false;
+        //                             tipValue = 0;
+        //                           }
+        //                           isTipSelected = false;
+        //                           isTipSelected1 = false;
+        //                           isTipSelected2 = false;
+        //                           // grandtotal += tipValue;
+        //                         });
+        //                       } else {
+        //                         _displayDialog(context);
+        //                       }
+        //                     },
+        //                     child: Container(
+        //                       padding:
+        //                           const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        //                       decoration: BoxDecoration(
+        //                         color: isTipSelected3
+        //                             ? Color(COLOR_PRIMARY)
+        //                             : isDarkMode(context)
+        //                                 ? const Color(DARK_COLOR)
+        //                                 : const Color(0xffFFFFFF),
+        //                         borderRadius: BorderRadius.circular(8),
+        //                         border: Border.all(
+        //                             color: const Color(0xff9091A4), width: 1),
+        //                       ),
+        //                       child: Center(
+        //                           child: Text(
+        //                         "Other".tr(),
+        //                         style: TextStyle(
+        //                             fontFamily: "Poppinsm",
+        //                             color: isDarkMode(context)
+        //                                 ? const Color(0xffFFFFFF)
+        //                                 : const Color(0xff333333),
+        //                             fontSize: 14),
+        //                       )),
+        //                     ),
+        //                   ),
+        //                 )
+        //               ],
+        //             )
+        //           ],
+        //         ),
+        //       )
+        //     : Container(),
+        // Container(
+        //   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        //   margin: const EdgeInsets.all(10),
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.circular(10),
+        //     border: Border.all(
+        //         color: isDarkMode(context)
+        //             ? const Color(DarkContainerBorderColor)
+        //             : Colors.grey.shade100,
+        //         width: 1),
+        //     color: isDarkMode(context)
+        //         ? const Color(DarkContainerColor)
+        //         : Colors.white,
+        //     boxShadow: [
+        //       isDarkMode(context)
+        //           ? const BoxShadow()
+        //           : BoxShadow(
+        //               color: Colors.grey.withOpacity(0.5),
+        //               blurRadius: 5,
+        //             ),
+        //     ],
+        //   ),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Text(
+        //             "Remarks".tr(),
+        //             style: const TextStyle(
+        //               fontFamily: "Poppinsm",
+        //             ),
+        //           ),
+        //           Text("Write remarks for store".tr(),
+        //               style: const TextStyle(
+        //                 fontFamily: "Poppinsr",
+        //               )),
+        //         ],
+        //       ),
+        //       GestureDetector(
+        //         onTap: () {
+        //           showModalBottomSheet(
+        //               isScrollControlled: true,
+        //               isDismissible: true,
+        //               context: context,
+        //               backgroundColor: Colors.transparent,
+        //               enableDrag: true,
+        //               builder: (BuildContext context) => noteSheet());
+        //         },
+        //         child: const Image(
+        //             image: AssetImage("assets/images/add.png"), width: 40),
+        //       )
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
@@ -1262,7 +1645,8 @@ class _CartScreenState extends State<CartScreen> {
   // }
 
   addtocard(CartProduct cartProduct, qun) async {
-    await cartDatabase.updateProduct(CartProduct(
+    await cartDatabase.updateProduct(
+      CartProduct(
         id: cartProduct.id,
         name: cartProduct.name,
         photo: cartProduct.photo,
@@ -1270,7 +1654,9 @@ class _CartScreenState extends State<CartScreen> {
         vendorID: cartProduct.vendorID,
         quantity: qun,
         category_id: cartProduct.category_id,
-        discountPrice: cartProduct.discountPrice!));
+        discountPrice: cartProduct.discountPrice!,
+      ),
+    );
   }
 
   removetocard(CartProduct cartProduct, qun) async {
@@ -1293,48 +1679,63 @@ class _CartScreenState extends State<CartScreen> {
 
   sheet() {
     return Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
-        height: MediaQuery.of(context).size.height * 0.88,
-        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
-        child: FutureBuilder<List<OfferModel>>(
-            future: coupon,
-            initialData: const [],
-            builder: (context, snapshot) {
-              snapshot = snapshot;
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator.adaptive(
-                    valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                  ),
-                );
-              }
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height / 4.3,
+          left: 25,
+          right: 25),
+      height: MediaQuery.of(context).size.height * 0.88,
+      decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(style: BorderStyle.none)),
+      child: FutureBuilder<List<OfferModel>>(
+        future: coupon,
+        initialData: const [],
+        builder: (context, snapshot) {
+          snapshot = snapshot;
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator.adaptive(
+                valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+              ),
+            );
+          }
 
-              // coupon = snapshot.data as Future<List<CouponModel>> ;
-              return Column(children: [
-                InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      height: 45,
-                      decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 0.3), color: Colors.transparent, shape: BoxShape.circle),
+          // coupon = snapshot.data as Future<List<CouponModel>> ;
+          return Column(
+            children: [
+              InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 45,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 0.3),
+                        color: Colors.transparent,
+                        shape: BoxShape.circle),
 
-                      // radius: 20,
-                      child: const Center(
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                    // radius: 20,
+                    child: const Center(
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                    )),
-                const SizedBox(
-                  height: 25,
-                ),
-                Expanded(
-                    child: Container(
+                    ),
+                  )),
+              const SizedBox(
+                height: 25,
+              ),
+              Expanded(
+                child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-                    color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+                    border: Border.all(
+                        color: isDarkMode(context)
+                            ? const Color(DarkContainerBorderColor)
+                            : Colors.grey.shade100,
+                        width: 1),
+                    color: isDarkMode(context)
+                        ? const Color(DarkContainerColor)
+                        : Colors.white,
                     boxShadow: [
                       isDarkMode(context)
                           ? const BoxShadow()
@@ -1351,52 +1752,66 @@ class _CartScreenState extends State<CartScreen> {
                         Container(
                             padding: const EdgeInsets.only(top: 30),
                             child: const Image(
-                              image: AssetImage('assets/images/redeem_coupon.png'),
+                              image:
+                                  AssetImage('assets/images/redeem_coupon.png'),
                               width: 100,
                             )),
                         Container(
                             padding: const EdgeInsets.only(top: 20),
                             child: Text(
                               'Redeem Your Coupons'.tr(),
-                              style: const TextStyle(fontFamily: 'Poppinssb', fontSize: 16),
+                              style: const TextStyle(
+                                  fontFamily: 'Poppinssb', fontSize: 16),
                             )),
                         Container(
                             padding: const EdgeInsets.only(top: 10),
                             child: Text(
                               "Voucher or Coupon code".tr(),
-                              style: const TextStyle(fontFamily: 'Poppinsr', color: Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                              style: const TextStyle(
+                                  fontFamily: 'Poppinsr',
+                                  color: Color(0XFF9091A4),
+                                  letterSpacing: 0.5,
+                                  height: 2),
                             ).tr()),
                         Container(
-                            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                            // height: 120,
-                            child: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(12),
-                                dashPattern: const [4, 2],
-                                color: const Color(0XFFB7B7B7),
-                                child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                    child: Container(
-                                        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
-                                        // height: 120,
-                                        alignment: Alignment.center,
-                                        child: TextFormField(
-                                          textAlign: TextAlign.center,
-                                          controller: txt,
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 20),
+                          // height: 120,
+                          child: DottedBorder(
+                            borderType: BorderType.RRect,
+                            radius: const Radius.circular(12),
+                            dashPattern: const [4, 2],
+                            color: const Color(0XFFB7B7B7),
+                            child: ClipRRect(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(12)),
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                    left: 20, right: 20, top: 20, bottom: 20),
+                                // height: 120,
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  controller: txt,
 
-                                          // textAlignVertical: TextAlignVertical.center,
-                                          decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            hintText: "Write Coupon Code".tr(),
-                                            //  hintTextDirection: TextDecoration.lineThrough
-                                            // contentPadding: EdgeInsets.only(left: 80,right: 30),
-                                          ),
-                                        ))))),
+                                  // textAlignVertical: TextAlignVertical.center,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Write Coupon Code".tr(),
+                                    //  hintTextDirection: TextDecoration.lineThrough
+                                    // contentPadding: EdgeInsets.only(left: 80,right: 30),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 30, bottom: 30),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 100, vertical: 15),
                               backgroundColor: Color(COLOR_PRIMARY),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -1404,11 +1819,15 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             onPressed: () {
                               setState(() {
-                                for (int a = 0; a < snapshot.data!.length; a++) {
+                                for (int a = 0;
+                                    a < snapshot.data!.length;
+                                    a++) {
                                   OfferModel coupon = snapshot.data![a];
 
-                                  if (vendorID == coupon.restaurantId || coupon.restaurantId == "") {
-                                    if (txt.text.toString() == coupon.offerCode!.toString()) {
+                                  if (vendorID == coupon.restaurantId ||
+                                      coupon.restaurantId == "") {
+                                    if (txt.text.toString() ==
+                                        coupon.offerCode!.toString()) {
                                       print(coupon.toJson());
                                       setState(() {
                                         couponModel = coupon;
@@ -1431,65 +1850,79 @@ class _CartScreenState extends State<CartScreen> {
                             },
                             child: Text(
                               "REDEEM NOW".tr(),
-                              style: TextStyle(color: isDarkMode(context) ? Colors.black : Colors.white, fontFamily: 'Poppinsm', fontSize: 16),
+                              style: TextStyle(
+                                  color: isDarkMode(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontFamily: 'Poppinsm',
+                                  fontSize: 16),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                )),
-                //buildcouponItem(snapshot)
-                //  listData(snapshot)
-              ]);
-            }));
+                ),
+              ),
+              //buildcouponItem(snapshot)
+              //  listData(snapshot)
+            ],
+          );
+        },
+      ),
+    );
   }
 
   _displayDialog(BuildContext context) async {
     return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Tip your driver partner'.tr()),
-            content: TextField(
-              controller: _textFieldController,
-              textInputAction: TextInputAction.go,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration: InputDecoration(hintText: "Enter your tip".tr()),
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Tip your driver partner'.tr()),
+          content: TextField(
+            controller: _textFieldController,
+            textInputAction: TextInputAction.go,
+            keyboardType: TextInputType.numberWithOptions(),
+            decoration: InputDecoration(hintText: "Enter your tip".tr()),
+          ),
+          actions: <Widget>[
+            new ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(COLOR_PRIMARY),
+                  textStyle: TextStyle(fontWeight: FontWeight.normal)),
+              child: new Text('Cancel'.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-            actions: <Widget>[
-              new ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Color(COLOR_PRIMARY), textStyle: TextStyle(fontWeight: FontWeight.normal)),
-                child: new Text('Cancel'.tr()),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Color(COLOR_PRIMARY), textStyle: TextStyle(fontWeight: FontWeight.normal)),
-                child: new Text('Submit'.tr()),
-                onPressed: () {
-                  setState(() {
-                    var value = _textFieldController.text.toString();
-                    if (value.isEmpty) {
-                      isTipSelected3 = false;
-                      tipValue = 0;
-                    } else {
-                      isTipSelected3 = true;
-                      tipValue = double.parse(value);
-                    }
-                    isTipSelected = false;
-                    isTipSelected1 = false;
-                    isTipSelected2 = false;
+            new ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(COLOR_PRIMARY),
+                  textStyle: TextStyle(fontWeight: FontWeight.normal)),
+              child: new Text('Submit'.tr()),
+              onPressed: () {
+                setState(() {
+                  var value = _textFieldController.text.toString();
+                  if (value.isEmpty) {
+                    isTipSelected3 = false;
+                    tipValue = 0;
+                  } else {
+                    isTipSelected3 = true;
+                    tipValue = double.parse(value);
+                  }
+                  isTipSelected = false;
+                  isTipSelected1 = false;
+                  isTipSelected2 = false;
 
-                    Navigator.of(context).pop();
-                  });
-                },
-              )
-            ],
-          );
-        });
+                  Navigator.of(context).pop();
+                });
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 
   Future<void> getPrefData() async {
@@ -1533,7 +1966,11 @@ class _CartScreenState extends State<CartScreen> {
         child: Center(
             child: Text(
           amountShow(amount: amount),
-          style: TextStyle(fontFamily: "Poppinssm", color: isDarkMode(context) ? Color(0xffFFFFFF) : Color(0xff333333), fontSize: 14),
+          style: TextStyle(
+              fontFamily: "Poppinssm",
+              color:
+                  isDarkMode(context) ? Color(0xffFFFFFF) : Color(0xff333333),
+              fontSize: 14),
         )),
       ),
     );
@@ -1541,15 +1978,24 @@ class _CartScreenState extends State<CartScreen> {
 
   noteSheet() {
     return Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 4.3, left: 25, right: 25),
-        height: MediaQuery.of(context).size.height * 0.88,
-        decoration: BoxDecoration(color: Colors.transparent, border: Border.all(style: BorderStyle.none)),
-        child: Column(children: [
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height / 4.3,
+          left: 25,
+          right: 25),
+      height: MediaQuery.of(context).size.height * 0.88,
+      decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(style: BorderStyle.none)),
+      child: Column(
+        children: [
           InkWell(
               onTap: () => Navigator.pop(context),
               child: Container(
                 height: 45,
-                decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 0.3), color: Colors.transparent, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 0.3),
+                    color: Colors.transparent,
+                    shape: BoxShape.circle),
 
                 // radius: 20,
                 child: Center(
@@ -1567,8 +2013,14 @@ class _CartScreenState extends State<CartScreen> {
               child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: isDarkMode(context) ? const Color(DarkContainerBorderColor) : Colors.grey.shade100, width: 1),
-              color: isDarkMode(context) ? const Color(DarkContainerColor) : Colors.white,
+              border: Border.all(
+                  color: isDarkMode(context)
+                      ? const Color(DarkContainerBorderColor)
+                      : Colors.grey.shade100,
+                  width: 1),
+              color: isDarkMode(context)
+                  ? const Color(DarkContainerColor)
+                  : Colors.white,
               boxShadow: [
                 isDarkMode(context)
                     ? const BoxShadow()
@@ -1586,13 +2038,24 @@ class _CartScreenState extends State<CartScreen> {
                       padding: EdgeInsets.only(top: 20),
                       child: Text(
                         'Remarks'.tr(),
-                        style: TextStyle(fontFamily: 'Poppinssb', color: isDarkMode(context) ? Color(0XFFD5D5D5) : Color(0XFF2A2A2A), fontSize: 16),
+                        style: TextStyle(
+                            fontFamily: 'Poppinssb',
+                            color: isDarkMode(context)
+                                ? Color(0XFFD5D5D5)
+                                : Color(0XFF2A2A2A),
+                            fontSize: 16),
                       )),
                   Container(
                       padding: EdgeInsets.only(top: 10),
                       child: Text(
                         'Write remarks for store',
-                        style: TextStyle(fontFamily: 'Poppinsr', color: isDarkMode(context) ? Colors.white70 : Color(0XFF9091A4), letterSpacing: 0.5, height: 2),
+                        style: TextStyle(
+                            fontFamily: 'Poppinsr',
+                            color: isDarkMode(context)
+                                ? Colors.white70
+                                : Color(0XFF9091A4),
+                            letterSpacing: 0.5,
+                            height: 2),
                       ).tr()),
                   Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -1602,9 +2065,11 @@ class _CartScreenState extends State<CartScreen> {
                           radius: Radius.circular(12),
                           dashPattern: [4, 2],
                           child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12)),
                               child: Container(
-                                  padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+                                  padding: EdgeInsets.only(
+                                      left: 20, right: 20, top: 20, bottom: 20),
                                   alignment: Alignment.center,
                                   child: TextFormField(
                                     textAlign: TextAlign.center,
@@ -1618,7 +2083,8 @@ class _CartScreenState extends State<CartScreen> {
                     padding: const EdgeInsets.only(top: 30, bottom: 30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 100, vertical: 15),
                         backgroundColor: Color(COLOR_PRIMARY),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -1629,7 +2095,12 @@ class _CartScreenState extends State<CartScreen> {
                       },
                       child: Text(
                         'SUBMIT'.tr(),
-                        style: TextStyle(color: isDarkMode(context) ? Colors.white : Colors.black, fontFamily: 'Poppinsm', fontSize: 16),
+                        style: TextStyle(
+                            color: isDarkMode(context)
+                                ? Colors.white
+                                : Colors.black,
+                            fontFamily: 'Poppinsm',
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -1637,13 +2108,16 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
           )),
-        ]));
+        ],
+      ),
+    );
   }
 }
 
 Widget _buildChip(String label, int attributesOptionIndex) {
   return Container(
-    decoration: BoxDecoration(color: const Color(0xffEEEDED), borderRadius: BorderRadius.circular(4)),
+    decoration: BoxDecoration(
+        color: const Color(0xffEEEDED), borderRadius: BorderRadius.circular(4)),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Text(
