@@ -303,6 +303,8 @@ import 'package:gromart_customer/services/FirebaseHelper.dart';
 import 'package:gromart_customer/services/helper.dart';
 import 'package:gromart_customer/ui/accountDetails/AccountDetailsScreen.dart';
 import 'package:gromart_customer/ui/auth/AuthScreen.dart';
+import 'package:gromart_customer/ui/dineInScreen/my_booking_screen.dart';
+import 'package:gromart_customer/ui/ordersScreen/OrdersScreen.dart';
 import 'package:gromart_customer/ui/privacy_policy/privacy_policy.dart';
 import 'package:gromart_customer/ui/termsAndCondition/terms_and_codition.dart';
 import 'package:image_picker/image_picker.dart';
@@ -460,6 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('My Orders'),
               onTap: () {
                 // Functionality to view orders
+                push(context, OrdersScreen());
               },
               trailing: Icon(Icons.arrow_forward_ios_rounded),
             ),

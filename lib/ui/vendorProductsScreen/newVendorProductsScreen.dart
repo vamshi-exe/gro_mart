@@ -198,7 +198,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
     return CustomScrollView(
       controller: scrollController,
       slivers: [
-        buildAppBar(),
+        // buildAppBar(),
         buildBody(),
       ],
     );
@@ -253,7 +253,7 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
                 : index == 0
                     ? buildVeg(veg, nonveg)
                     : Container(),
-            _buildSectionTileHeader(category),
+            // _buildSectionTileHeader(category),
             _buildFoodTileList(context, category),
           ],
         ),
@@ -261,25 +261,27 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
     );
   }
 
-  Widget _buildSectionTileHeader(VendorCategoryModel category) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: Text(
-          category.title.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSectionTileHeader(VendorCategoryModel category) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 20),
+  //     child: Padding(
+  //       padding: const EdgeInsets.only(top: 10),
+  //       child: Text(
+  //         category.title.toString(),
+  //         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   var isAnother = 0;
   bool veg = false;
   bool nonveg = false;
 
   Widget _buildFoodTileList(
-      BuildContext context, VendorCategoryModel category) {
+    BuildContext context,
+    VendorCategoryModel category,
+  ) {
     isAnother = 0;
     return Column(
       children: [
@@ -295,20 +297,31 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
+              // color: Colors.blue,
               width: 100,
               child: ListView.builder(
                 // physics: AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.zero,
                 dragStartBehavior: DragStartBehavior.start,
                 shrinkWrap: true,
-                itemCount: 7,
+                itemCount: vendorCateoryModel.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      color: Colors.amber,
-                      height: 50,
-                      width: 50,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Implement the logic to handle item tap here
+                        // For example, you can filter the products by selected category
+                      },
+                      child: Container(
+                        color: Colors.amber,
+                        height: 50,
+                        alignment: Alignment.center,
+                        child: Text(
+                          vendorCateoryModel[index].title ?? 'Unknown Title',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -432,45 +445,48 @@ class _NewVendorProductsScreenState extends State<NewVendorProductsScreen>
           //         width: 0,
           //       );
           //     }),
-          Stack(children: [
-            Center(
-              child: CachedNetworkImage(
-                height: 80,
-                width: 80,
-                imageUrl: getImageVAlidUrl(productModel.photo),
-                imageBuilder: (context, imageProvider) => Container(
-                  // width: 100,
-                  // height: 100,
-                  decoration: BoxDecoration(
+          Stack(
+            children: [
+              Center(
+                child: CachedNetworkImage(
+                  height: 80,
+                  width: 80,
+                  imageUrl: getImageVAlidUrl(productModel.photo),
+                  imageBuilder: (context, imageProvider) => Container(
+                    // width: 100,
+                    // height: 100,
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
                         image: imageProvider,
                         fit: BoxFit.cover,
-                      )),
-                ),
-                errorWidget: (context, url, error) => ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(
-                    placeholderImage,
-                    fit: BoxFit.cover,
-                    // width: MediaQuery.of(context).size.width,
-                    // height: MediaQuery.of(context).size.height,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.network(
+                      placeholderImage,
+                      fit: BoxFit.cover,
+                      // width: MediaQuery.of(context).size.width,
+                      // height: MediaQuery.of(context).size.height,
+                    ),
                   ),
                 ),
               ),
-            ),
-            // Positioned(
-            //   // left: 5,
-            //   // top: 5,
-            //   child: Icon(
-            //     Icons.circle,
-            //     color: productModel.veg == true
-            //         ? const Color(0XFF3dae7d)
-            //         : Colors.redAccent,
-            //     size: 13,
-            //   ),
-            // )
-          ]),
+              // Positioned(
+              //   // left: 5,
+              //   // top: 5,
+              //   child: Icon(
+              //     Icons.circle,
+              //     color: productModel.veg == true
+              //         ? const Color(0XFF3dae7d)
+              //         : Colors.redAccent,
+              //     size: 13,
+              //   ),
+              // )
+            ],
+          ),
           // const SizedBox(
           //   width: 10,
           // ),

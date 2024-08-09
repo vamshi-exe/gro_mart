@@ -144,48 +144,49 @@ class _ChatScreensState extends State<ChatScreens> {
                         ),
                       ),
                       Flexible(
-                          child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: TextField(
-                          textInputAction: TextInputAction.send,
-                          keyboardType: TextInputType.text,
-                          textCapitalization: TextCapitalization.sentences,
-                          controller: _messageController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.black.withOpacity(0.05),
-                            contentPadding:
-                                const EdgeInsets.only(top: 3, left: 10),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.black.withOpacity(0.05),
-                                  width: 0.0),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(30)),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: TextField(
+                            textInputAction: TextInputAction.send,
+                            keyboardType: TextInputType.text,
+                            textCapitalization: TextCapitalization.sentences,
+                            controller: _messageController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.05),
+                              contentPadding:
+                                  const EdgeInsets.only(top: 3, left: 10),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.black.withOpacity(0.05),
+                                    width: 0.0),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(30)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.black.withOpacity(0.05),
+                                    width: 0.0),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(30)),
+                              ),
+                              hintText: 'Start typing ...'.tr(),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.black.withOpacity(0.05),
-                                  width: 0.0),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(30)),
-                            ),
-                            hintText: 'Start typing ...'.tr(),
+                            onSubmitted: (value) async {
+                              if (_messageController.text.isNotEmpty) {
+                                _sendMessage(
+                                    _messageController.text, null, '', 'text');
+                                Timer(
+                                    const Duration(milliseconds: 500),
+                                    () => _controller.jumpTo(
+                                        _controller.position.maxScrollExtent));
+                                _messageController.clear();
+                                setState(() {});
+                              }
+                            },
                           ),
-                          onSubmitted: (value) async {
-                            if (_messageController.text.isNotEmpty) {
-                              _sendMessage(
-                                  _messageController.text, null, '', 'text');
-                              Timer(
-                                  const Duration(milliseconds: 500),
-                                  () => _controller.jumpTo(
-                                      _controller.position.maxScrollExtent));
-                              _messageController.clear();
-                              setState(() {});
-                            }
-                          },
                         ),
-                      )),
+                      ),
                       Container(
                         margin: const EdgeInsets.only(left: 10),
                         decoration: BoxDecoration(

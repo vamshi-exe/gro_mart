@@ -148,12 +148,13 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 
     pushAndRemoveUntil(
         context,
-        ContainerScreen(
-          user: MyAppState.currentUser!,
-          currentWidget: OrdersScreen(isAnimation: true),
-          appBarTitle: 'Orders'.tr(),
-          drawerSelection: DrawerSelection.Orders,
-        ),
+        // ContainerScreen(
+        //   user: MyAppState.currentUser!,
+        //   currentWidget: 
+        //   appBarTitle: 'Orders'.tr(),
+        //   drawerSelection: DrawerSelection.Orders,
+        // ),
+        OrdersScreen(isAnimation: true),
         false);
   }
 }

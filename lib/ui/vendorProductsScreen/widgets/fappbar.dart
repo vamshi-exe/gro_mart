@@ -426,12 +426,13 @@ class FAppBar extends SliverAppBar {
   showTiming(BuildContext context) {
     List<WorkingHoursModel> workingHours = vendorModel.workingHours;
     return Container(
-        decoration: BoxDecoration(
-            color:
-                isDarkMode(context) ? const Color(DARK_BG_COLOR) : Colors.white,
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        child: Stack(children: [
+      decoration: BoxDecoration(
+          color:
+              isDarkMode(context) ? const Color(DARK_BG_COLOR) : Colors.white,
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      child: Stack(
+        children: [
           SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -458,103 +459,101 @@ class FAppBar extends SliverAppBar {
                   height: 10,
                 ),
                 ListView.builder(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: workingHours.length,
-                    itemBuilder: (context, dayIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 2),
-                        child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            color: isDarkMode(context)
-                                ? const Color(0XFFdadada).withOpacity(0.1)
-                                : Colors.grey.shade100,
-                            elevation: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Column(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: workingHours.length,
+                  itemBuilder: (context, dayIndex) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 2),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                        color: isDarkMode(context)
+                            ? const Color(0XFFdadada).withOpacity(0.1)
+                            : Colors.grey.shade100,
+                        elevation: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: Text(
-                                          workingHours[dayIndex].day.toString(),
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontFamily: "Poppinsm",
-                                              color: isDarkMode(context)
-                                                  ? const Color(0XFFdadada)
-                                                  : const Color(0XFF252525)),
-                                        ),
-                                      ),
-                                      Visibility(
-                                        visible: workingHours[dayIndex]
-                                            .timeslot!
-                                            .isEmpty,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 15),
-                                          child: Container(
-                                              height: 35,
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color:
-                                                          Colors.grey.shade400,
-                                                      width: 1.5),
-                                                  color: isDarkMode(context)
-                                                      ? Colors.white
-                                                      : Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                              padding: const EdgeInsets.only(
-                                                  right: 15, left: 10),
-                                              child: Row(children: [
-                                                const Icon(
-                                                  Icons.circle,
-                                                  color: Colors.redAccent,
-                                                  size: 11,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text("Closed".tr(),
-                                                    style: const TextStyle(
-                                                        fontFamily: "Poppinsm",
-                                                        color:
-                                                            Colors.redAccent))
-                                              ])),
-                                        ),
-                                      )
-                                    ],
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: Text(
+                                      workingHours[dayIndex].day.toString(),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: "Poppinsm",
+                                          color: isDarkMode(context)
+                                              ? const Color(0XFFdadada)
+                                              : const Color(0XFF252525)),
+                                    ),
                                   ),
                                   Visibility(
                                     visible: workingHours[dayIndex]
                                         .timeslot!
-                                        .isNotEmpty,
-                                    child: ListView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: workingHours[dayIndex]
-                                            .timeslot!
-                                            .length,
-                                        itemBuilder: (context, slotIndex) {
-                                          return buildTimeCard(
-                                              timeslot: workingHours[dayIndex]
-                                                  .timeslot![slotIndex]);
-                                        }),
-                                  ),
+                                        .isEmpty,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Container(
+                                          height: 35,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade400,
+                                                  width: 1.5),
+                                              color: isDarkMode(context)
+                                                  ? Colors.white
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          padding: const EdgeInsets.only(
+                                              right: 15, left: 10),
+                                          child: Row(children: [
+                                            const Icon(
+                                              Icons.circle,
+                                              color: Colors.redAccent,
+                                              size: 11,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Closed".tr(),
+                                                style: const TextStyle(
+                                                    fontFamily: "Poppinsm",
+                                                    color: Colors.redAccent))
+                                          ])),
+                                    ),
+                                  )
                                 ],
                               ),
-                            )),
-                      );
-                    }),
+                              Visibility(
+                                visible:
+                                    workingHours[dayIndex].timeslot!.isNotEmpty,
+                                child: ListView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      workingHours[dayIndex].timeslot!.length,
+                                  itemBuilder: (context, slotIndex) {
+                                    return buildTimeCard(
+                                        timeslot: workingHours[dayIndex]
+                                            .timeslot![slotIndex]);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -562,23 +561,28 @@ class FAppBar extends SliverAppBar {
             ),
           ),
           Positioned(
-              right: 10,
-              top: 5,
-              child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child:
-                      // Padding(padding: EdgeInsets.only(right: 5,top: 5,left: 15,bottom: 20),
-                      // child:
-                      const CircleAvatar(
-                          radius: 17,
-                          backgroundColor: Color(0XFFF1F4F7),
-                          child: Image(
-                            image: AssetImage("assets/images/cancel.png"),
-                            height: 35,
-                          ))))
-        ]));
+            right: 10,
+            top: 5,
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child:
+                  // Padding(padding: EdgeInsets.only(right: 5,top: 5,left: 15,bottom: 20),
+                  // child:
+                  const CircleAvatar(
+                radius: 17,
+                backgroundColor: Color(0XFFF1F4F7),
+                child: Image(
+                  image: AssetImage("assets/images/cancel.png"),
+                  height: 35,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   buildTimeCard({required Timeslot timeslot}) {
