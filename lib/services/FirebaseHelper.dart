@@ -79,11 +79,7 @@ class FireStoreUtils {
 
   Stream<User> getDriver(String userId) async* {
     driverStreamController = StreamController();
-    driverStreamSub = firestore
-        .collection(USERS)
-        .doc(userId)
-        .snapshots()
-        .listen((onData) async {
+    driverStreamSub = firestore.collection(USERS).doc(userId).snapshots().listen((onData) async {
       if (onData.data() != null) {
         User? user = User.fromJson(onData.data()!);
         driverStreamController.sink.add(user);
@@ -97,11 +93,7 @@ class FireStoreUtils {
 
   Stream<OrderModel?> getOrderByID(String inProgressOrderID) async* {
     ordersByIdStreamController = StreamController();
-    ordersByIdStreamSub = firestore
-        .collection(ORDERS)
-        .doc(inProgressOrderID)
-        .snapshots()
-        .listen((onData) async {
+    ordersByIdStreamSub = firestore.collection(ORDERS).doc(inProgressOrderID).snapshots().listen((onData) async {
       if (onData.data() != null) {
         OrderModel? orderModel = OrderModel.fromJson(onData.data()!);
         ordersByIdStreamController.sink.add(orderModel);
@@ -110,8 +102,7 @@ class FireStoreUtils {
     yield* ordersByIdStreamController.stream;
   }
 
-  Future<RatingModel?> getOrderReviewsbyID(
-      String ordertId, String productId) async {
+  Future<RatingModel?> getOrderReviewsbyID(String ordertId, String productId) async {
     RatingModel? ratingproduct;
     QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
         .collection(Order_Rating)
@@ -131,11 +122,7 @@ class FireStoreUtils {
   }
 
   static Future<ProductModel?> updateProduct(ProductModel prodduct) async {
-    return await firestore
-        .collection(PRODUCTS)
-        .doc(prodduct.id)
-        .set(prodduct.toJson())
-        .then((document) {
+    return await firestore.collection(PRODUCTS).doc(prodduct.id).set(prodduct.toJson()).then((document) {
       return prodduct;
     });
   }
@@ -147,8 +134,7 @@ class FireStoreUtils {
         .where("show_in_homepage", isEqualTo: true)
         .where('publish', isEqualTo: true)
         .get();
-    await Future.forEach(cuisinesQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(cuisinesQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         cuisines.add(VendorCategoryModel.fromJson(document.data()));
       } catch (e) {
@@ -166,8 +152,7 @@ class FireStoreUtils {
         .where("position", isEqualTo: "top")
         .orderBy("set_order", descending: false)
         .get();
-    await Future.forEach(bannerHomeQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(bannerHomeQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         bannerHome.add(BannerModel.fromJson(document.data()));
       } catch (e) {
@@ -185,8 +170,7 @@ class FireStoreUtils {
         .where("position", isEqualTo: "middle")
         .orderBy("set_order", descending: false)
         .get();
-    await Future.forEach(bannerHomeQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(bannerHomeQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         bannerHome.add(BannerModel.fromJson(document.data()));
       } catch (e) {
@@ -198,10 +182,8 @@ class FireStoreUtils {
 
   Future<ProductModel> getProductByID(String productId) async {
     late ProductModel productModel;
-    QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
-        .collection(PRODUCTS)
-        .where('id', isEqualTo: productId)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> vendorsQuery =
+        await firestore.collection(PRODUCTS).where('id', isEqualTo: productId).get();
     try {
       if (vendorsQuery.docs.isNotEmpty) {
         productModel = ProductModel.fromJson(vendorsQuery.docs.first.data());
@@ -213,8 +195,7 @@ class FireStoreUtils {
   }
 
   static Future<VendorModel?> getVendor(String vid) async {
-    DocumentSnapshot<Map<String, dynamic>> userDocument =
-        await firestore.collection(VENDORS).doc(vid).get();
+    DocumentSnapshot<Map<String, dynamic>> userDocument = await firestore.collection(VENDORS).doc(vid).get();
     if (userDocument.data() != null && userDocument.exists) {
       return VendorModel.fromJson(userDocument.data()!);
     } else {
@@ -223,16 +204,12 @@ class FireStoreUtils {
     }
   }
 
-  Future<List<FavouriteItemModel>> getFavouritesProductList(
-      String userId) async {
+  Future<List<FavouriteItemModel>> getFavouritesProductList(String userId) async {
     List<FavouriteItemModel> lstFavourites = [];
 
-    QuerySnapshot<Map<String, dynamic>> favourites = await firestore
-        .collection(FavouriteItem)
-        .where('user_id', isEqualTo: userId)
-        .get();
-    await Future.forEach(favourites.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> favourites =
+        await firestore.collection(FavouriteItem).where('user_id', isEqualTo: userId).get();
+    await Future.forEach(favourites.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         lstFavourites.add(FavouriteItemModel.fromJson(document.data()));
       } catch (e) {
@@ -244,10 +221,8 @@ class FireStoreUtils {
 
   static Future<List<AttributesModel>> getAttributes() async {
     List<AttributesModel> attributesList = [];
-    QuerySnapshot<Map<String, dynamic>> currencyQuery =
-        await firestore.collection(VENDOR_ATTRIBUTES).get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore.collection(VENDOR_ATTRIBUTES).get();
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         attributesList.add(AttributesModel.fromJson(document.data()));
       } catch (e) {
@@ -259,13 +234,10 @@ class FireStoreUtils {
 
   static Future<List<ReviewAttributeModel>> getAllReviewAttributes() async {
     List<ReviewAttributeModel> reviewAttributesList = [];
-    QuerySnapshot<Map<String, dynamic>> currencyQuery =
-        await firestore.collection(REVIEW_ATTRIBUTES).get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore.collection(REVIEW_ATTRIBUTES).get();
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
-        reviewAttributesList
-            .add(ReviewAttributeModel.fromJson(document.data()));
+        reviewAttributesList.add(ReviewAttributeModel.fromJson(document.data()));
       } catch (e) {
         debugPrint('FireStoreUtils.getCurrencys Parse error $e');
       }
@@ -275,12 +247,9 @@ class FireStoreUtils {
 
   Future<List<RatingModel>> getReviewList(String productId) async {
     List<RatingModel> reviewList = [];
-    QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore
-        .collection(Order_Rating)
-        .where('productId', isEqualTo: productId)
-        .get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> currencyQuery =
+        await firestore.collection(Order_Rating).where('productId', isEqualTo: productId).get();
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         reviewList.add(RatingModel.fromJson(document.data()));
       } catch (e) {
@@ -298,8 +267,7 @@ class FireStoreUtils {
         .where('publish', isEqualTo: true)
         .limit(6)
         .get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         print(document.data());
         productList.add(ProductModel.fromJson(document.data()));
@@ -310,8 +278,7 @@ class FireStoreUtils {
     return productList;
   }
 
-  static Future<List<ProductModel>> getTakeawayStoreProduct(
-      String storeId) async {
+  static Future<List<ProductModel>> getTakeawayStoreProduct(String storeId) async {
     List<ProductModel> productList = [];
     QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore
         .collection(PRODUCTS)
@@ -319,8 +286,7 @@ class FireStoreUtils {
         .where('publish', isEqualTo: true)
         .limit(6)
         .get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         print(document.data());
         productList.add(ProductModel.fromJson(document.data()));
@@ -331,16 +297,14 @@ class FireStoreUtils {
     return productList;
   }
 
-  static Future<List<ProductModel>> getProductListByCategoryId(
-      String categoryId) async {
+  static Future<List<ProductModel>> getProductListByCategoryId(String categoryId) async {
     List<ProductModel> productList = [];
     QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore
         .collection(PRODUCTS)
         .where('categoryID', isEqualTo: categoryId)
         .where('publish', isEqualTo: true)
         .get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         productList.add(ProductModel.fromJson(document.data()));
       } catch (e) {
@@ -351,10 +315,7 @@ class FireStoreUtils {
   }
 
   Future<void> setFavouriteStoreItem(FavouriteItemModel favouriteModel) async {
-    await firestore
-        .collection(FavouriteItem)
-        .add(favouriteModel.toJson())
-        .then((value) {});
+    await firestore.collection(FavouriteItem).add(favouriteModel.toJson()).then((value) {});
   }
 
   void removeFavouriteItem(FavouriteItemModel favouriteModel) {
@@ -364,11 +325,7 @@ class FireStoreUtils {
         .get()
         .then((value) {
       for (var element in value.docs) {
-        FirebaseFirestore.instance
-            .collection(FavouriteItem)
-            .doc(element.id)
-            .delete()
-            .then((value) {
+        FirebaseFirestore.instance.collection(FavouriteItem).doc(element.id).delete().then((value) {
           debugPrint("Success!");
         });
       }
@@ -376,8 +333,7 @@ class FireStoreUtils {
   }
 
   static Future<User?> getCurrentUser(String uid) async {
-    DocumentSnapshot<Map<String, dynamic>> userDocument =
-        await firestore.collection(USERS).doc(uid).get();
+    DocumentSnapshot<Map<String, dynamic>> userDocument = await firestore.collection(USERS).doc(uid).get();
     if (userDocument.data() != null && userDocument.exists) {
       return User.fromJson(userDocument.data()!);
     } else {
@@ -387,11 +343,7 @@ class FireStoreUtils {
 
   static Future<NotificationModel?> getNotificationContent(String type) async {
     NotificationModel? notificationModel;
-    await firestore
-        .collection(dynamicNotification)
-        .where('type', isEqualTo: type)
-        .get()
-        .then((value) {
+    await firestore.collection(dynamicNotification).where('type', isEqualTo: type).get().then((value) {
       print("------>");
       if (value.docs.isNotEmpty) {
         print(value.docs.first.data());
@@ -399,10 +351,7 @@ class FireStoreUtils {
         notificationModel = NotificationModel.fromJson(value.docs.first.data());
       } else {
         notificationModel = NotificationModel(
-            id: "",
-            message: "Notification setup is pending",
-            subject: "setup notification",
-            type: "");
+            id: "", message: "Notification setup is pending", subject: "setup notification", type: "");
       }
     });
     return notificationModel;
@@ -410,16 +359,11 @@ class FireStoreUtils {
 
   static Future<EmailTemplateModel?> getEmailTemplates(String type) async {
     EmailTemplateModel? emailTemplateModel;
-    await firestore
-        .collection(emailTemplates)
-        .where('type', isEqualTo: type)
-        .get()
-        .then((value) {
+    await firestore.collection(emailTemplates).where('type', isEqualTo: type).get().then((value) {
       print("------>");
       if (value.docs.isNotEmpty) {
         print(value.docs.first.data());
-        emailTemplateModel =
-            EmailTemplateModel.fromJson(value.docs.first.data());
+        emailTemplateModel = EmailTemplateModel.fromJson(value.docs.first.data());
       }
     });
     return emailTemplateModel;
@@ -448,8 +392,7 @@ class FireStoreUtils {
       };
 
       var client = new http.Client();
-      await client.post(Uri.parse(url),
-          headers: header, body: json.encode(request));
+      await client.post(Uri.parse(url), headers: header, body: json.encode(request));
       return true;
     } catch (e) {
       debugPrint(e.toString());
@@ -457,8 +400,7 @@ class FireStoreUtils {
     }
   }
 
-  static Future<bool> sendChatFcmMessage(
-      String title, String message, String token) async {
+  static Future<bool> sendChatFcmMessage(String title, String message, String token) async {
     try {
       var url = 'https://fcm.googleapis.com/fcm/send';
       var header = {
@@ -479,8 +421,7 @@ class FireStoreUtils {
       };
 
       var client = new http.Client();
-      await client.post(Uri.parse(url),
-          headers: header, body: json.encode(request));
+      await client.post(Uri.parse(url), headers: header, body: json.encode(request));
       return true;
     } catch (e) {
       debugPrint(e.toString());
@@ -509,46 +450,34 @@ class FireStoreUtils {
   }
 
   static Future<User?> updateCurrentUser(User user) async {
-    return await firestore
-        .collection(USERS)
-        .doc(user.userID)
-        .set(user.toJson())
-        .then((document) {
+    return await firestore.collection(USERS).doc(user.userID).set(user.toJson()).then((document) {
       MyAppState.currentUser = user;
       return user;
     });
   }
 
   static Future<VendorModel?> updateVendor(VendorModel vendor) async {
-    return await firestore
-        .collection(VENDORS)
-        .doc(vendor.id)
-        .set(vendor.toJson())
-        .then((document) {
+    return await firestore.collection(VENDORS).doc(vendor.id).set(vendor.toJson()).then((document) {
       return vendor;
     });
   }
 
-  static Future<String> uploadUserImageToFireStorage(
-      File image, String userID) async {
+  static Future<String> uploadUserImageToFireStorage(File image, String userID) async {
     Reference upload = storage.child('images/$userID.png');
 
     UploadTask uploadTask = upload.putFile(image);
-    var downloadUrl =
-        await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    var downloadUrl = await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
     return downloadUrl.toString();
   }
 
-  Future<Url> uploadChatImageToFireStorage(
-      File image, BuildContext context) async {
+  Future<Url> uploadChatImageToFireStorage(File image, BuildContext context) async {
     showProgress(context, 'Uploading image...'.tr(), false);
     var uniqueID = Uuid().v4();
     Reference upload = storage.child('images/$uniqueID.png');
     File compressedImage = await compressImage(image);
     UploadTask uploadTask = upload.putFile(compressedImage);
     uploadTask.snapshotEvents.listen((event) {
-      updateProgress(
-          '${"Uploading image".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
+      updateProgress('${"Uploading image".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
           '${(event.totalBytes.toDouble() / 1000).toStringAsFixed(2)} '
           'KB');
     });
@@ -559,12 +488,10 @@ class FireStoreUtils {
     var downloadUrl = await storageRef.getDownloadURL();
     var metaData = await storageRef.getMetadata();
     hideProgress();
-    return Url(
-        mime: metaData.contentType ?? 'image', url: downloadUrl.toString());
+    return Url(mime: metaData.contentType ?? 'image', url: downloadUrl.toString());
   }
 
-  Future<ChatVideoContainer> uploadChatVideoToFireStorage(
-      File video, BuildContext context) async {
+  Future<ChatVideoContainer> uploadChatVideoToFireStorage(File video, BuildContext context) async {
     showProgress(context, 'Uploading video...'.tr(), false);
     var uniqueID = Uuid().v4();
     Reference upload = storage.child('videos/$uniqueID.mp4');
@@ -572,8 +499,7 @@ class FireStoreUtils {
     SettableMetadata metadata = SettableMetadata(contentType: 'video');
     UploadTask uploadTask = upload.putFile(compressedVideo, metadata);
     uploadTask.snapshotEvents.listen((event) {
-      updateProgress(
-          '${"Uploading video".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
+      updateProgress('${"Uploading video".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
           '${(event.totalBytes.toDouble() / 1000).toStringAsFixed(2)} '
           'KB');
     });
@@ -581,15 +507,12 @@ class FireStoreUtils {
     var downloadUrl = await storageRef.getDownloadURL();
     var metaData = await storageRef.getMetadata();
     final uint8list = await VideoThumbnail.thumbnailFile(
-        video: downloadUrl,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        imageFormat: ImageFormat.PNG);
+        video: downloadUrl, thumbnailPath: (await getTemporaryDirectory()).path, imageFormat: ImageFormat.PNG);
     final file = File(uint8list ?? '');
     String thumbnailDownloadUrl = await uploadVideoThumbnailToFireStorage(file);
     hideProgress();
     return ChatVideoContainer(
-        videoUrl: Url(
-            url: downloadUrl.toString(), mime: metaData.contentType ?? 'video'),
+        videoUrl: Url(url: downloadUrl.toString(), mime: metaData.contentType ?? 'video'),
         thumbnailUrl: thumbnailDownloadUrl);
   }
 
@@ -598,8 +521,7 @@ class FireStoreUtils {
     Reference upload = storage.child('thumbnails/$uniqueID.png');
     File compressedImage = await compressImage(file);
     UploadTask uploadTask = upload.putFile(compressedImage);
-    var downloadUrl =
-        await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    var downloadUrl = await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
     return downloadUrl.toString();
   }
 
@@ -610,38 +532,30 @@ class FireStoreUtils {
         User userModel = User.fromJson(user.data() ?? {});
         userStreamController.sink.add(userModel);
       } catch (e) {
-        debugPrint(
-            'FireStoreUtils.getUserByID failed to parse user object ${user.id}');
+        debugPrint('FireStoreUtils.getUserByID failed to parse user object ${user.id}');
       }
     });
     yield* userStreamController.stream;
   }
 
   Stream<StripeKeyModel> getStripe() async* {
-    StreamController<StripeKeyModel> stripeStreamController =
-        StreamController();
+    StreamController<StripeKeyModel> stripeStreamController = StreamController();
     firestore.collection(Setting).doc(StripeSetting).snapshots().listen((user) {
       try {
         StripeKeyModel userModel = StripeKeyModel.fromJson(user.data() ?? {});
         stripeStreamController.sink.add(userModel);
       } catch (e) {
-        debugPrint(
-            'FireStoreUtils.getUserByID failed to parse user object ${user.id}');
+        debugPrint('FireStoreUtils.getUserByID failed to parse user object ${user.id}');
       }
     });
     yield* stripeStreamController.stream;
   }
 
   static getPayFastSettingData() async {
-    firestore
-        .collection(Setting)
-        .doc("payFastSettings")
-        .get()
-        .then((payFastData) {
+    firestore.collection(Setting).doc("payFastSettings").get().then((payFastData) {
       debugPrint(payFastData.data().toString());
       try {
-        PayFastSettingData payFastSettingData =
-            PayFastSettingData.fromJson(payFastData.data() ?? {});
+        PayFastSettingData payFastSettingData = PayFastSettingData.fromJson(payFastData.data() ?? {});
         debugPrint(payFastData.toString());
         UserPreference.setPayFastData(payFastSettingData);
       } catch (error) {
@@ -654,8 +568,7 @@ class FireStoreUtils {
   static getMercadoPagoSettingData() async {
     firestore.collection(Setting).doc("MercadoPago").get().then((mercadoPago) {
       try {
-        MercadoPagoSettingData mercadoPagoDataModel =
-            MercadoPagoSettingData.fromJson(mercadoPago.data() ?? {});
+        MercadoPagoSettingData mercadoPagoDataModel = MercadoPagoSettingData.fromJson(mercadoPago.data() ?? {});
         UserPreference.setMercadoPago(mercadoPagoDataModel);
       } catch (error) {
         debugPrint(error.toString());
@@ -664,14 +577,9 @@ class FireStoreUtils {
   }
 
   static getPaypalSettingData() async {
-    firestore
-        .collection(Setting)
-        .doc("paypalSettings")
-        .get()
-        .then((paypalData) {
+    firestore.collection(Setting).doc("paypalSettings").get().then((paypalData) {
       try {
-        PaypalSettingData paypalDataModel =
-            PaypalSettingData.fromJson(paypalData.data() ?? {});
+        PaypalSettingData paypalDataModel = PaypalSettingData.fromJson(paypalData.data() ?? {});
         UserPreference.setPayPalData(paypalDataModel);
       } catch (error) {
         debugPrint(error.toString());
@@ -680,14 +588,9 @@ class FireStoreUtils {
   }
 
   static getStripeSettingData() async {
-    firestore
-        .collection(Setting)
-        .doc("stripeSettings")
-        .get()
-        .then((stripeData) {
+    firestore.collection(Setting).doc("stripeSettings").get().then((stripeData) {
       try {
-        StripeSettingData stripeSettingData =
-            StripeSettingData.fromJson(stripeData.data() ?? {});
+        StripeSettingData stripeSettingData = StripeSettingData.fromJson(stripeData.data() ?? {});
         UserPreference.setStripeData(stripeSettingData);
       } catch (error) {
         debugPrint(error.toString());
@@ -696,14 +599,9 @@ class FireStoreUtils {
   }
 
   static getFlutterWaveSettingData() async {
-    firestore
-        .collection(Setting)
-        .doc("flutterWave")
-        .get()
-        .then((flutterWaveData) {
+    firestore.collection(Setting).doc("flutterWave").get().then((flutterWaveData) {
       try {
-        FlutterWaveSettingData flutterWaveSettingData =
-            FlutterWaveSettingData.fromJson(flutterWaveData.data() ?? {});
+        FlutterWaveSettingData flutterWaveSettingData = FlutterWaveSettingData.fromJson(flutterWaveData.data() ?? {});
         UserPreference.setFlutterWaveData(flutterWaveSettingData);
       } catch (error) {
         debugPrint("error>>>122");
@@ -715,8 +613,7 @@ class FireStoreUtils {
   static getPayStackSettingData() async {
     firestore.collection(Setting).doc("payStack").get().then((payStackData) {
       try {
-        PayStackSettingData payStackSettingData =
-            PayStackSettingData.fromJson(payStackData.data() ?? {});
+        PayStackSettingData payStackSettingData = PayStackSettingData.fromJson(payStackData.data() ?? {});
         UserPreference.setPayStackData(payStackSettingData);
       } catch (error) {
         debugPrint("error>>>122");
@@ -728,8 +625,7 @@ class FireStoreUtils {
   static getPaytmSettingData() async {
     firestore.collection(Setting).doc("PaytmSettings").get().then((paytmData) {
       try {
-        PaytmSettingData paytmSettingData =
-            PaytmSettingData.fromJson(paytmData.data() ?? {});
+        PaytmSettingData paytmSettingData = PaytmSettingData.fromJson(paytmData.data() ?? {});
         UserPreference.setPaytmData(paytmSettingData);
       } catch (error) {
         debugPrint(error.toString());
@@ -738,11 +634,7 @@ class FireStoreUtils {
   }
 
   static getWalletSettingData() {
-    firestore
-        .collection(Setting)
-        .doc('walletSettings')
-        .get()
-        .then((walletSetting) {
+    firestore.collection(Setting).doc('walletSettings').get().then((walletSetting) {
       try {
         bool walletEnable = walletSetting.data()!['isEnabled'];
         UserPreference.setWalletData(walletEnable);
@@ -769,8 +661,7 @@ class FireStoreUtils {
         // razorpayKey = userModel.razorpayKey;
         // razorpaySecret = userModel.razorpaySecret;
       } catch (e) {
-        debugPrint(
-            'FireStoreUtils.getUserByID failed to parse user object ${user.id}');
+        debugPrint('FireStoreUtils.getUserByID failed to parse user object ${user.id}');
       }
     });
 
@@ -778,8 +669,7 @@ class FireStoreUtils {
   }
 
   Future<CodModel?> getCod() async {
-    DocumentSnapshot<Map<String, dynamic>> codQuery =
-        await firestore.collection(Setting).doc('CODSettings').get();
+    DocumentSnapshot<Map<String, dynamic>> codQuery = await firestore.collection(Setting).doc('CODSettings').get();
     if (codQuery.data() != null) {
       debugPrint("dataaaaaa");
       return CodModel.fromJson(codQuery.data()!);
@@ -790,8 +680,7 @@ class FireStoreUtils {
   }
 
   Future<DeliveryChargeModel?> getDeliveryCharges() async {
-    DocumentSnapshot<Map<String, dynamic>> codQuery =
-        await firestore.collection(Setting).doc('DeliveryCharge').get();
+    DocumentSnapshot<Map<String, dynamic>> codQuery = await firestore.collection(Setting).doc('DeliveryCharge').get();
     if (codQuery.data() != null) {
       return DeliveryChargeModel.fromJson(codQuery.data()!);
     } else {
@@ -800,8 +689,7 @@ class FireStoreUtils {
   }
 
   Future<String?> getRestaurantNearBy() async {
-    DocumentSnapshot<Map<String, dynamic>> codQuery =
-        await firestore.collection(Setting).doc('RestaurantNearBy').get();
+    DocumentSnapshot<Map<String, dynamic>> codQuery = await firestore.collection(Setting).doc('RestaurantNearBy').get();
     if (codQuery.data() != null) {
       radiusValue = double.parse(codQuery["radios"].toString());
       debugPrint("--------->$radiusValue");
@@ -812,8 +700,7 @@ class FireStoreUtils {
   }
 
   Future<Map<String, dynamic>?> getAdminCommission() async {
-    DocumentSnapshot<Map<String, dynamic>> codQuery =
-        await firestore.collection(Setting).doc('AdminCommission').get();
+    DocumentSnapshot<Map<String, dynamic>> codQuery = await firestore.collection(Setting).doc('AdminCommission').get();
     if (codQuery.data() != null) {
       Map<String, dynamic> getValue = {
         "adminCommission": codQuery["fix_commission"].toString(),
@@ -830,15 +717,12 @@ class FireStoreUtils {
   Future<List<ProductModel>> getAllProducts() async {
     List<ProductModel> products = [];
 
-    QuerySnapshot<Map<String, dynamic>> productsQuery =
-        await firestore.collection(PRODUCTS).get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> productsQuery = await firestore.collection(PRODUCTS).get();
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         products.add(ProductModel.fromJson(document.data()));
       } catch (e) {
-        debugPrint(
-            'productspppp**-FireStoreUtils.getAllProducts Parse error $e');
+        debugPrint('productspppp**-FireStoreUtils.getAllProducts Parse error $e');
       }
     });
     return products;
@@ -847,17 +731,13 @@ class FireStoreUtils {
   Future<List<ProductModel>> getAllTakeAWayProducts() async {
     List<ProductModel> products = [];
 
-    QuerySnapshot<Map<String, dynamic>> productsQuery = await firestore
-        .collection(PRODUCTS)
-        .where('publish', isEqualTo: true)
-        .get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> productsQuery =
+        await firestore.collection(PRODUCTS).where('publish', isEqualTo: true).get();
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         products.add(ProductModel.fromJson(document.data()));
       } catch (e) {
-        debugPrint(
-            'productspppp**-123--FireStoreUtils.getAllProducts Parse error $e');
+        debugPrint('productspppp**-123--FireStoreUtils.getAllProducts Parse error $e');
       }
     });
     return products;
@@ -871,13 +751,11 @@ class FireStoreUtils {
         .where("takeawayOption", isEqualTo: false)
         .where('publish', isEqualTo: true)
         .get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         products.add(ProductModel.fromJson(document.data()));
       } catch (e) {
-        debugPrint(
-            'productspppp**-FireStoreUtils.getAllProducts Parse error $e  ${document.data()['id']}');
+        debugPrint('productspppp**-FireStoreUtils.getAllProducts Parse error $e  ${document.data()['id']}');
       }
     });
     return products;
@@ -886,14 +764,8 @@ class FireStoreUtils {
   Future<bool> blockUser(User blockedUser, String type) async {
     bool isSuccessful = false;
     BlockUserModel blockUserModel = BlockUserModel(
-        type: type,
-        source: MyAppState.currentUser!.userID,
-        dest: blockedUser.userID,
-        createdAt: Timestamp.now());
-    await firestore
-        .collection(REPORTS)
-        .add(blockUserModel.toJson())
-        .then((onValue) {
+        type: type, source: MyAppState.currentUser!.userID, dest: blockedUser.userID, createdAt: Timestamp.now());
+    await firestore.collection(REPORTS).add(blockUserModel.toJson()).then((onValue) {
       isSuccessful = true;
     });
     return isSuccessful;
@@ -906,8 +778,7 @@ class FireStoreUtils {
     SettableMetadata metadata = SettableMetadata(contentType: 'audio');
     UploadTask uploadTask = upload.putFile(file, metadata);
     uploadTask.snapshotEvents.listen((event) {
-      updateProgress(
-          '${"Uploading Audio".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
+      updateProgress('${"Uploading Audio".tr()} ${(event.bytesTransferred.toDouble() / 1000).toStringAsFixed(2)} /'
           '${(event.totalBytes.toDouble() / 1000).toStringAsFixed(2)} '
           'KB');
     });
@@ -918,18 +789,14 @@ class FireStoreUtils {
     var downloadUrl = await storageRef.getDownloadURL();
     var metaData = await storageRef.getMetadata();
     hideProgress();
-    return Url(
-        mime: metaData.contentType ?? 'audio', url: downloadUrl.toString());
+    return Url(mime: metaData.contentType ?? 'audio', url: downloadUrl.toString());
   }
 
   Future<List<VendorCategoryModel>> getCuisines() async {
     List<VendorCategoryModel> cuisines = [];
-    QuerySnapshot<Map<String, dynamic>> cuisinesQuery = await firestore
-        .collection(VENDORS_CATEGORIES)
-        .where('publish', isEqualTo: true)
-        .get();
-    await Future.forEach(cuisinesQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> cuisinesQuery =
+        await firestore.collection(VENDORS_CATEGORIES).where('publish', isEqualTo: true).get();
+    await Future.forEach(cuisinesQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         cuisines.add(VendorCategoryModel.fromJson(document.data()));
       } catch (e) {
@@ -974,10 +841,8 @@ class FireStoreUtils {
 
   Future<List<VendorModel>> getVendors() async {
     List<VendorModel> vendors = [];
-    QuerySnapshot<Map<String, dynamic>> vendorsQuery =
-        await firestore.collection(VENDORS).get();
-    await Future.forEach(vendorsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore.collection(VENDORS).get();
+    await Future.forEach(vendorsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         vendors.add(VendorModel.fromJson(document.data()));
         print("*-*-/*-*-" + document["title"].toString());
@@ -1001,8 +866,7 @@ class FireStoreUtils {
         .snapshots()
         .listen((onData) async {
       orders.clear();
-      await Future.forEach(onData.docs,
-          (QueryDocumentSnapshot<Map<String, dynamic>> element) {
+      await Future.forEach(onData.docs, (QueryDocumentSnapshot<Map<String, dynamic>> element) {
         try {
           OrderModel orderModel = OrderModel.fromJson(element.data());
           if (!orders.contains(orderModel)) {
@@ -1017,13 +881,11 @@ class FireStoreUtils {
     yield* ordersStreamController!.stream;
   }
 
-  Stream<List<BookTableModel>> getBookingOrders(
-      String userID, bool isUpComing) async* {
+  Stream<List<BookTableModel>> getBookingOrders(String userID, bool isUpComing) async* {
     List<BookTableModel> orders = [];
 
     if (isUpComing) {
-      StreamController<List<BookTableModel>> upcomingordersStreamController =
-          StreamController();
+      StreamController<List<BookTableModel>> upcomingordersStreamController = StreamController();
       firestore
           .collection(ORDERS_TABLE)
           .where('author.id', isEqualTo: userID)
@@ -1032,8 +894,7 @@ class FireStoreUtils {
           .orderBy('createdAt', descending: true)
           .snapshots()
           .listen((onData) async {
-        await Future.forEach(onData.docs,
-            (QueryDocumentSnapshot<Map<String, dynamic>> element) {
+        await Future.forEach(onData.docs, (QueryDocumentSnapshot<Map<String, dynamic>> element) {
           try {
             orders.add(BookTableModel.fromJson(element.data()));
           } catch (e, s) {
@@ -1044,8 +905,7 @@ class FireStoreUtils {
       });
       yield* upcomingordersStreamController.stream;
     } else {
-      StreamController<List<BookTableModel>> bookedordersStreamController =
-          StreamController();
+      StreamController<List<BookTableModel>> bookedordersStreamController = StreamController();
       firestore
           .collection(ORDERS_TABLE)
           .where('author.id', isEqualTo: userID)
@@ -1054,8 +914,7 @@ class FireStoreUtils {
           .orderBy('createdAt', descending: true)
           .snapshots()
           .listen((onData) async {
-        await Future.forEach(onData.docs,
-            (QueryDocumentSnapshot<Map<String, dynamic>> element) {
+        await Future.forEach(onData.docs, (QueryDocumentSnapshot<Map<String, dynamic>> element) {
           try {
             orders.add(BookTableModel.fromJson(element.data()));
           } catch (e, s) {
@@ -1078,10 +937,7 @@ class FireStoreUtils {
   }
 
   Future<void> setFavouriteRestaurant(FavouriteModel favouriteModel) async {
-    await firestore
-        .collection(FavouriteRestaurant)
-        .add(favouriteModel.toJson())
-        .then((value) {
+    await firestore.collection(FavouriteRestaurant).add(favouriteModel.toJson()).then((value) {
       print("===FAVOURITE ADDED===");
     });
   }
@@ -1093,11 +949,7 @@ class FireStoreUtils {
         .get()
         .then((value) {
       value.docs.forEach((element) {
-        FirebaseFirestore.instance
-            .collection(FavouriteRestaurant)
-            .doc(element.id)
-            .delete()
-            .then((value) {
+        FirebaseFirestore.instance.collection(FavouriteRestaurant).doc(element.id).delete().then((value) {
           print("Success!");
         });
       });
@@ -1107,16 +959,13 @@ class FireStoreUtils {
   StreamController<List<VendorModel>>? allResaturantStreamController;
 
   Stream<List<VendorModel>> getAllRestaurants({String? path}) async* {
-    allResaturantStreamController =
-        StreamController<List<VendorModel>>.broadcast();
+    allResaturantStreamController = StreamController<List<VendorModel>>.broadcast();
     List<VendorModel> vendors = [];
 
     try {
       var collectionReference = (path == null || path.isEmpty)
           ? firestore.collection(VENDORS)
-          : firestore
-              .collection(VENDORS)
-              .where("enabledDiveInFuture", isEqualTo: true);
+          : firestore.collection(VENDORS).where("enabledDiveInFuture", isEqualTo: true);
       GeoFirePoint center = geo.point(
           latitude: MyAppState.selectedPosotion.location!.latitude,
           longitude: MyAppState.selectedPosotion.location!.longitude);
@@ -1124,11 +973,7 @@ class FireStoreUtils {
       String field = 'g';
       Stream<List<DocumentSnapshot>> stream = geo
           .collection(collectionRef: collectionReference)
-          .within(
-              center: center,
-              radius: radiusValue,
-              field: field,
-              strictMode: true);
+          .within(center: center, radius: radiusValue, field: field, strictMode: true);
 
       stream.listen((List<DocumentSnapshot> documentList) {
         if (documentList.isEmpty) {
@@ -1151,14 +996,11 @@ class FireStoreUtils {
   StreamController<List<VendorModel>>? allCategoryResaturantStreamController;
 
   Stream<List<VendorModel>> getCategoryRestaurants(String categoryId) async* {
-    allCategoryResaturantStreamController =
-        StreamController<List<VendorModel>>.broadcast();
+    allCategoryResaturantStreamController = StreamController<List<VendorModel>>.broadcast();
     List<VendorModel> vendors = [];
 
     try {
-      var collectionReference = firestore
-          .collection(VENDORS)
-          .where('categoryID', isEqualTo: categoryId);
+      var collectionReference = firestore.collection(VENDORS).where('categoryID', isEqualTo: categoryId);
 
       GeoFirePoint center = geo.point(
           latitude: MyAppState.selectedPosotion.location!.latitude,
@@ -1167,11 +1009,7 @@ class FireStoreUtils {
       String field = 'g';
       Stream<List<DocumentSnapshot>> stream = geo
           .collection(collectionRef: collectionReference)
-          .within(
-              center: center,
-              radius: radiusValue,
-              field: field,
-              strictMode: true);
+          .within(center: center, radius: radiusValue, field: field, strictMode: true);
 
       stream.listen((List<DocumentSnapshot> documentList) {
         if (documentList.isEmpty) {
@@ -1196,24 +1034,17 @@ class FireStoreUtils {
   Stream<List<VendorModel>> getVendorsForNewArrival({String? path}) async* {
     List<VendorModel> vendors = [];
 
-    newArrivalStreamController =
-        StreamController<List<VendorModel>>.broadcast();
+    newArrivalStreamController = StreamController<List<VendorModel>>.broadcast();
     var collectionReference = (path == null || path.isEmpty)
         ? firestore.collection(VENDORS)
-        : firestore
-            .collection(VENDORS)
-            .where("enabledDiveInFuture", isEqualTo: true);
+        : firestore.collection(VENDORS).where("enabledDiveInFuture", isEqualTo: true);
     GeoFirePoint center = geo.point(
         latitude: MyAppState.selectedPosotion.location!.latitude,
         longitude: MyAppState.selectedPosotion.location!.longitude);
     String field = 'g';
     Stream<List<DocumentSnapshot>> stream = geo
         .collection(collectionRef: collectionReference)
-        .within(
-            center: center,
-            radius: radiusValue,
-            field: field,
-            strictMode: true);
+        .within(center: center, radius: radiusValue, field: field, strictMode: true);
     stream.listen((List<DocumentSnapshot> documentList) {
       documentList.forEach((DocumentSnapshot document) {
         final data = document.data() as Map<String, dynamic>;
@@ -1235,8 +1066,7 @@ class FireStoreUtils {
 
   late StreamController<List<VendorModel>> cusionStreamController;
 
-  Stream<List<VendorModel>> getVendorsByCuisineID(String cuisineID,
-      {bool? isDinein}) async* {
+  Stream<List<VendorModel>> getVendorsByCuisineID(String cuisineID, {bool? isDinein}) async* {
     await getRestaurantNearBy();
     cusionStreamController = StreamController<List<VendorModel>>.broadcast();
     List<VendorModel> vendors = [];
@@ -1245,20 +1075,14 @@ class FireStoreUtils {
             .collection(VENDORS)
             .where('categoryID', isEqualTo: cuisineID)
             .where("enabledDiveInFuture", isEqualTo: true)
-        : firestore
-            .collection(VENDORS)
-            .where('categoryID', isEqualTo: cuisineID);
+        : firestore.collection(VENDORS).where('categoryID', isEqualTo: cuisineID);
     GeoFirePoint center = geo.point(
         latitude: MyAppState.selectedPosotion.location!.latitude,
         longitude: MyAppState.selectedPosotion.location!.longitude);
     String field = 'g';
     Stream<List<DocumentSnapshot>> stream = geo
         .collection(collectionRef: collectionReference)
-        .within(
-            center: center,
-            radius: radiusValue,
-            field: field,
-            strictMode: true);
+        .within(center: center, radius: radiusValue, field: field, strictMode: true);
     stream.listen((List<DocumentSnapshot> documentList) {
       Future.forEach(documentList, (DocumentSnapshot element) {
         final data = element.data() as Map<String, dynamic>;
@@ -1282,11 +1106,7 @@ class FireStoreUtils {
 
   Future<CurrencyModel?> getCurrency() async {
     CurrencyModel? currencyModel;
-    await firestore
-        .collection(Currency)
-        .where("isActive", isEqualTo: true)
-        .get()
-        .then((value) {
+    await firestore.collection(Currency).where("isActive", isEqualTo: true).get().then((value) {
       if (value.docs.isNotEmpty) {
         currencyModel = CurrencyModel.fromJson(value.docs.first.data());
       }
@@ -1303,8 +1123,7 @@ class FireStoreUtils {
         .where("isEnabled", isEqualTo: true)
         .where("isPublic", isEqualTo: true)
         .get();
-    await Future.forEach(couponsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(couponsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         coupon.add(OfferModel.fromJson(document.data()));
       } catch (e) {
@@ -1322,8 +1141,7 @@ class FireStoreUtils {
         .where('expiresAt', isGreaterThanOrEqualTo: Timestamp.now())
         .where("isEnabled", isEqualTo: true)
         .get();
-    await Future.forEach(couponsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(couponsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         coupon.add(OfferModel.fromJson(document.data()));
       } catch (e) {
@@ -1335,10 +1153,8 @@ class FireStoreUtils {
 
   Future<List<StoryModel>> getStory() async {
     List<StoryModel> story = [];
-    QuerySnapshot<Map<String, dynamic>> storyQuery =
-        await firestore.collection(STORY).get();
-    await Future.forEach(storyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> storyQuery = await firestore.collection(STORY).get();
+    await Future.forEach(storyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         story.add(StoryModel.fromJson(document.data()));
       } catch (e) {
@@ -1356,8 +1172,7 @@ class FireStoreUtils {
         .where('vendorID', isEqualTo: vendorID)
         .where('publish', isEqualTo: true)
         .get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         products.add(ProductModel.fromJson(document.data()));
         //print('=====TP+++++ ${document.data().toString()}');
@@ -1378,8 +1193,7 @@ class FireStoreUtils {
         .where("takeawayOption", isEqualTo: false)
         .where('publish', isEqualTo: true)
         .get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         products.add(ProductModel.fromJson(document.data()));
       } catch (e) {
@@ -1401,8 +1215,7 @@ class FireStoreUtils {
         .get();
 
     print("-------->${bannerHomeQuery.docs}");
-    await Future.forEach(bannerHomeQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(bannerHomeQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         print("-------->");
         print(document.data());
@@ -1414,8 +1227,7 @@ class FireStoreUtils {
     return offers;
   }
 
-  Future<VendorCategoryModel?> getVendorCategoryById(
-      String vendorCategoryID) async {
+  Future<VendorCategoryModel?> getVendorCategoryById(String vendorCategoryID) async {
     print('we are enter-->');
     VendorCategoryModel? vendorCategoryModel;
     QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
@@ -1426,8 +1238,7 @@ class FireStoreUtils {
     try {
       print('we are enter-->');
       if (vendorsQuery.docs.length > 0) {
-        vendorCategoryModel =
-            VendorCategoryModel.fromJson(vendorsQuery.docs.first.data());
+        vendorCategoryModel = VendorCategoryModel.fromJson(vendorsQuery.docs.first.data());
       }
     } catch (e) {
       print('FireStoreUtils.getVendorByVendorID Parse error $e');
@@ -1437,10 +1248,8 @@ class FireStoreUtils {
 
   Future<VendorModel> getVendorByVendorID(String vendorID) async {
     late VendorModel vendor;
-    QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
-        .collection(VENDORS)
-        .where('id', isEqualTo: vendorID)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> vendorsQuery =
+        await firestore.collection(VENDORS).where('id', isEqualTo: vendorID).get();
     try {
       if (vendorsQuery.docs.length > 0) {
         vendor = VendorModel.fromJson(vendorsQuery.docs.first.data());
@@ -1459,8 +1268,7 @@ class FireStoreUtils {
         .where('VendorId', isEqualTo: vendorId)
         // .orderBy('createdAt', descending: true)
         .get();
-    await Future.forEach(vendorsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    await Future.forEach(vendorsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       print(document);
       try {
         vendorreview.add(RatingModel.fromJson(document.data()));
@@ -1473,11 +1281,8 @@ class FireStoreUtils {
 
   Future<ProductModel> getProductByProductID(String productId) async {
     late ProductModel productModel;
-    QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
-        .collection(PRODUCTS)
-        .where('id', isEqualTo: productId)
-        .where('publish', isEqualTo: true)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> vendorsQuery =
+        await firestore.collection(PRODUCTS).where('id', isEqualTo: productId).where('publish', isEqualTo: true).get();
     try {
       if (vendorsQuery.docs.isNotEmpty) {
         productModel = ProductModel.fromJson(vendorsQuery.docs.first.data());
@@ -1488,12 +1293,9 @@ class FireStoreUtils {
     return productModel;
   }
 
-  Future<VendorCategoryModel?> getVendorCategoryByCategoryId(
-      String vendorCategoryID) async {
-    DocumentSnapshot<Map<String, dynamic>> documentReference = await firestore
-        .collection(VENDORS_CATEGORIES)
-        .doc(vendorCategoryID)
-        .get();
+  Future<VendorCategoryModel?> getVendorCategoryByCategoryId(String vendorCategoryID) async {
+    DocumentSnapshot<Map<String, dynamic>> documentReference =
+        await firestore.collection(VENDORS_CATEGORIES).doc(vendorCategoryID).get();
     if (documentReference.data() != null && documentReference.exists) {
       print("dataaaaaa aaa ");
       return VendorCategoryModel.fromJson(documentReference.data()!);
@@ -1503,8 +1305,7 @@ class FireStoreUtils {
     }
   }
 
-  Future<ReviewAttributeModel?> getVendorReviewAttribute(
-      String attrubuteId) async {
+  Future<ReviewAttributeModel?> getVendorReviewAttribute(String attrubuteId) async {
     DocumentSnapshot<Map<String, dynamic>> documentReference =
         await firestore.collection(REVIEW_ATTRIBUTES).doc(attrubuteId).get();
     if (documentReference.data() != null && documentReference.exists) {
@@ -1516,13 +1317,8 @@ class FireStoreUtils {
     }
   }
 
-  static Future<RatingModel?> updateReviewbyId(
-      RatingModel ratingproduct) async {
-    return await firestore
-        .collection(Order_Rating)
-        .doc(ratingproduct.id)
-        .set(ratingproduct.toJson())
-        .then((document) {
+  static Future<RatingModel?> updateReviewbyId(RatingModel ratingproduct) async {
+    return await firestore.collection(Order_Rating).doc(ratingproduct.id).set(ratingproduct.toJson()).then((document) {
       return ratingproduct;
     });
   }
@@ -1550,11 +1346,7 @@ class FireStoreUtils {
   }
 
   static Future addDriverInbox(InboxModel inboxModel) async {
-    return await firestore
-        .collection("chat_driver")
-        .doc(inboxModel.orderId)
-        .set(inboxModel.toJson())
-        .then((document) {
+    return await firestore.collection("chat_driver").doc(inboxModel.orderId).set(inboxModel.toJson()).then((document) {
       return inboxModel;
     });
   }
@@ -1574,12 +1366,9 @@ class FireStoreUtils {
   Future<List<FavouriteModel>> getFavouriteRestaurant(String userId) async {
     List<FavouriteModel> favouriteItem = [];
 
-    QuerySnapshot<Map<String, dynamic>> vendorsQuery = await firestore
-        .collection(FavouriteRestaurant)
-        .where('user_id', isEqualTo: userId)
-        .get();
-    await Future.forEach(vendorsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> vendorsQuery =
+        await firestore.collection(FavouriteRestaurant).where('user_id', isEqualTo: userId).get();
+    await Future.forEach(vendorsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         favouriteItem.add(FavouriteModel.fromJson(document.data()));
       } catch (e) {
@@ -1590,19 +1379,14 @@ class FireStoreUtils {
   }
 
   Future<OrderModel> placeOrder(OrderModel orderModel) async {
-    DocumentReference documentReference =
-        firestore.collection(ORDERS).doc(UserPreference.getOrderId());
+    DocumentReference documentReference = firestore.collection(ORDERS).doc(UserPreference.getOrderId());
     orderModel.id = documentReference.id;
     await documentReference.set(orderModel.toJson());
     return orderModel;
   }
 
-  Future<GiftCardsOrderModel> placeGiftCardOrder(
-      GiftCardsOrderModel giftCardsOrderModel) async {
-    await firestore
-        .collection(GIFT_PURCHASES)
-        .doc(giftCardsOrderModel.id)
-        .set(giftCardsOrderModel.toJson());
+  Future<GiftCardsOrderModel> placeGiftCardOrder(GiftCardsOrderModel giftCardsOrderModel) async {
+    await firestore.collection(GIFT_PURCHASES).doc(giftCardsOrderModel.id).set(giftCardsOrderModel.toJson());
     return giftCardsOrderModel;
   }
 
@@ -1614,8 +1398,7 @@ class FireStoreUtils {
         .get()
         .then((value) {
       for (var element in value.docs) {
-        GiftCardsOrderModel giftCardsOrderModel =
-            GiftCardsOrderModel.fromJson(element.data());
+        GiftCardsOrderModel giftCardsOrderModel = GiftCardsOrderModel.fromJson(element.data());
         giftCardsOrderList.add(giftCardsOrderModel);
       }
     });
@@ -1624,14 +1407,9 @@ class FireStoreUtils {
 
   Future<GiftCardsOrderModel?> checkRedeemCode(String giftCode) async {
     GiftCardsOrderModel? giftCardsOrderModel;
-    await firestore
-        .collection(GIFT_PURCHASES)
-        .where("giftCode", isEqualTo: giftCode)
-        .get()
-        .then((value) {
+    await firestore.collection(GIFT_PURCHASES).where("giftCode", isEqualTo: giftCode).get().then((value) {
       if (value.docs.isNotEmpty) {
-        giftCardsOrderModel =
-            GiftCardsOrderModel.fromJson(value.docs.first.data());
+        giftCardsOrderModel = GiftCardsOrderModel.fromJson(value.docs.first.data());
       }
     });
     return giftCardsOrderModel;
@@ -1650,8 +1428,7 @@ class FireStoreUtils {
   }
 
   Future<BookTableModel> bookTable(BookTableModel orderModel) async {
-    DocumentReference documentReference =
-        firestore.collection(ORDERS_TABLE).doc();
+    DocumentReference documentReference = firestore.collection(ORDERS_TABLE).doc();
     orderModel.id = documentReference.id;
     await documentReference.set(orderModel.toJson());
     return orderModel;
@@ -1673,12 +1450,9 @@ class FireStoreUtils {
   static Future<List<TopupTranHistoryModel>> getTopUpTransaction() async {
     final userId = MyAppState.currentUser!.userID; //UserPreference.getUserId();
     List<TopupTranHistoryModel> topUpHistoryList = [];
-    QuerySnapshot<Map<String, dynamic>> documentReference = await firestore
-        .collection(Wallet)
-        .where('user_id', isEqualTo: userId)
-        .get();
-    await Future.forEach(documentReference.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> documentReference =
+        await firestore.collection(Wallet).where('user_id', isEqualTo: userId).get();
+    await Future.forEach(documentReference.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         topUpHistoryList.add(TopupTranHistoryModel.fromJson(document.data()));
       } catch (e) {
@@ -1689,11 +1463,7 @@ class FireStoreUtils {
   }
 
   static Future topUpWalletAmount(
-      {String paymentMethod = "test",
-      bool isTopup = true,
-      required amount,
-      required id,
-      orderId = ""}) async {
+      {String paymentMethod = "test", bool isTopup = true, required amount, required id, orderId = ""}) async {
     print("this is te payment id");
     print(id);
     print(MyAppState.currentUser!.userID);
@@ -1708,11 +1478,7 @@ class FireStoreUtils {
         paymentMethod: paymentMethod,
         paymentStatus: "success",
         transactionUser: "user");
-    await firestore
-        .collection(Wallet)
-        .doc(id)
-        .set(historyModel.toJson())
-        .then((value) {
+    await firestore.collection(Wallet).doc(id).set(historyModel.toJson()).then((value) {
       firestore.collection(Wallet).doc(id).get().then((value) {
         DocumentSnapshot<Map<String, dynamic>> documentData = value;
         print("nato");
@@ -1738,20 +1504,17 @@ class FireStoreUtils {
           await firestore
               .collection(USERS)
               .doc(userId)
-              .update({"wallet_amount": user.walletAmount + amount}).then(
-                  (value) => print("north"));
+              .update({"wallet_amount": user.walletAmount + amount}).then((value) => print("north"));
           /*print(user.wallet_amount);
 
 
           walletAmount = user.wallet_amount! + amount;*/
-          DocumentSnapshot<Map<String, dynamic>> newUserDocument =
-              await firestore.collection(USERS).doc(userId).get();
+          DocumentSnapshot<Map<String, dynamic>> newUserDocument = await firestore.collection(USERS).doc(userId).get();
           MyAppState.currentUser = User.fromJson(newUserDocument.data()!);
           print(MyAppState.currentUser);
         } catch (error) {
           print(error);
-          if (error.toString() ==
-              "Bad state: field does not exist within the DocumentSnapshotPlatform") {
+          if (error.toString() == "Bad state: field does not exist within the DocumentSnapshotPlatform") {
             print("does not exist");
             //await firestore.collection(USERS).doc(userId).update({"wallet_amount": 0});
             //walletAmount = 0;
@@ -1769,24 +1532,18 @@ class FireStoreUtils {
     });
   }
 
-  static sendTopUpMail(
-      {required String amount,
-      required String paymentMethod,
-      required String tractionId}) async {
-    EmailTemplateModel? emailTemplateModel =
-        await FireStoreUtils.getEmailTemplates(walletTopup);
+  static sendTopUpMail({required String amount, required String paymentMethod, required String tractionId}) async {
+    EmailTemplateModel? emailTemplateModel = await FireStoreUtils.getEmailTemplates(walletTopup);
 
     String newString = emailTemplateModel!.message.toString();
-    newString = newString.replaceAll("{username}",
-        MyAppState.currentUser!.firstName + MyAppState.currentUser!.lastName);
-    newString = newString.replaceAll(
-        "{date}", DateFormat('yyyy-MM-dd').format(Timestamp.now().toDate()));
-    newString = newString.replaceAll("{amount}", amountShow(amount: amount));
     newString =
-        newString.replaceAll("{paymentmethod}", paymentMethod.toString());
+        newString.replaceAll("{username}", MyAppState.currentUser!.firstName + MyAppState.currentUser!.lastName);
+    newString = newString.replaceAll("{date}", DateFormat('yyyy-MM-dd').format(Timestamp.now().toDate()));
+    newString = newString.replaceAll("{amount}", amountShow(amount: amount));
+    newString = newString.replaceAll("{paymentmethod}", paymentMethod.toString());
     newString = newString.replaceAll("{transactionid}", tractionId.toString());
-    newString = newString.replaceAll("{newwalletbalance}.",
-        amountShow(amount: MyAppState.currentUser!.walletAmount.toString()));
+    newString = newString.replaceAll(
+        "{newwalletbalance}.", amountShow(amount: MyAppState.currentUser!.walletAmount.toString()));
     await sendMail(
         subject: emailTemplateModel.subject,
         isAdmin: emailTemplateModel.isSendToAdmin,
@@ -1809,15 +1566,13 @@ class FireStoreUtils {
     <tbody>
     """;
 
-    EmailTemplateModel? emailTemplateModel =
-        await FireStoreUtils.getEmailTemplates(newOrderPlaced);
+    EmailTemplateModel? emailTemplateModel = await FireStoreUtils.getEmailTemplates(newOrderPlaced);
 
     String newString = emailTemplateModel!.message.toString();
-    newString = newString.replaceAll("{username}",
-        MyAppState.currentUser!.firstName + MyAppState.currentUser!.lastName);
+    newString =
+        newString.replaceAll("{username}", MyAppState.currentUser!.firstName + MyAppState.currentUser!.lastName);
     newString = newString.replaceAll("{orderid}", orderModel.id);
-    newString = newString.replaceAll("{date}",
-        DateFormat('yyyy-MM-dd').format(orderModel.createdAt.toDate()));
+    newString = newString.replaceAll("{date}", DateFormat('yyyy-MM-dd').format(orderModel.createdAt.toDate()));
     newString = newString.replaceAll(
       "{address}",
       '${orderModel.address!.getFullAddress()}',
@@ -1854,8 +1609,7 @@ class FireStoreUtils {
       List<dynamic>? addon = element.extras;
       String extrasDisVal = '';
       for (int i = 0; i < addon!.length; i++) {
-        extrasDisVal +=
-            '${addon[i].toString().replaceAll("\"", "")} ${(i == addon.length - 1) ? "" : ","}';
+        extrasDisVal += '${addon[i].toString().replaceAll("\"", "")} ${(i == addon.length - 1) ? "" : ","}';
       }
       String product = """
         <tr>
@@ -1873,8 +1627,7 @@ class FireStoreUtils {
     });
 
     if (orderModel.specialDiscount!.isNotEmpty) {
-      specialDiscount = double.parse(
-          orderModel.specialDiscount!['special_discount'].toString());
+      specialDiscount = double.parse(orderModel.specialDiscount!['special_discount'].toString());
     }
 
     if (orderModel.couponId != null && orderModel.couponId!.isNotEmpty) {
@@ -1884,49 +1637,38 @@ class FireStoreUtils {
     List<String> taxHtmlList = [];
     if (taxList != null) {
       for (var element in taxList!) {
-        taxAmount = taxAmount +
-            calculateTax(
-                amount: (total - discount - specialDiscount).toString(),
-                taxModel: element);
+        taxAmount =
+            taxAmount + calculateTax(amount: (total - discount - specialDiscount).toString(), taxModel: element);
         String taxHtml =
             """<span style="font-size: 1rem;">${element.title}: ${amountShow(amount: calculateTax(amount: (total - discount - specialDiscount).toString(), taxModel: element).toString())}${taxList!.indexOf(element) == taxList!.length - 1 ? "</span>" : "<br></span>"}""";
         taxHtmlList.add(taxHtml);
       }
     }
 
-    var totalamount =
-        orderModel.deliveryCharge == null || orderModel.deliveryCharge!.isEmpty
-            ? total + taxAmount - discount - specialDiscount
-            : total +
-                taxAmount +
-                double.parse(orderModel.deliveryCharge!) +
-                double.parse(orderModel.tipValue!) -
-                discount -
-                specialDiscount;
+    var totalamount = orderModel.deliveryCharge == null || orderModel.deliveryCharge!.isEmpty
+        ? total + taxAmount - discount - specialDiscount
+        : total +
+            taxAmount +
+            double.parse(orderModel.deliveryCharge!) +
+            double.parse(orderModel.tipValue!) -
+            discount -
+            specialDiscount;
 
-    newString = newString.replaceAll(
-        "{subtotal}", amountShow(amount: total.toString()));
-    newString =
-        newString.replaceAll("{coupon}", orderModel.couponId.toString());
-    newString = newString.replaceAll(
-        "{discountamount}", amountShow(amount: orderModel.discount.toString()));
+    newString = newString.replaceAll("{subtotal}", amountShow(amount: total.toString()));
+    newString = newString.replaceAll("{coupon}", orderModel.couponId.toString());
+    newString = newString.replaceAll("{discountamount}", amountShow(amount: orderModel.discount.toString()));
     newString = newString.replaceAll("{specialcoupon}", specialLabel);
-    newString = newString.replaceAll("{specialdiscountamount}",
-        amountShow(amount: specialDiscount.toString()));
-    newString = newString.replaceAll(
-        "{shippingcharge}", amountShow(amount: deliveryCharge.toString()));
-    newString = newString.replaceAll(
-        "{tipamount}", amountShow(amount: tipValue.toString()));
-    newString = newString.replaceAll(
-        "{totalAmount}", amountShow(amount: totalamount.toString()));
+    newString = newString.replaceAll("{specialdiscountamount}", amountShow(amount: specialDiscount.toString()));
+    newString = newString.replaceAll("{shippingcharge}", amountShow(amount: deliveryCharge.toString()));
+    newString = newString.replaceAll("{tipamount}", amountShow(amount: tipValue.toString()));
+    newString = newString.replaceAll("{totalAmount}", amountShow(amount: totalamount.toString()));
 
     String tableHTML = htmlList.join();
     String lastHTML = "</tbody></table>";
-    newString = newString.replaceAll(
-        "{productdetails}", firstHTML + tableHTML + lastHTML);
+    newString = newString.replaceAll("{productdetails}", firstHTML + tableHTML + lastHTML);
     newString = newString.replaceAll("{taxdetails}", taxHtmlList.join());
-    newString = newString.replaceAll("{newwalletbalance}.",
-        amountShow(amount: MyAppState.currentUser!.walletAmount.toString()));
+    newString = newString.replaceAll(
+        "{newwalletbalance}.", amountShow(amount: MyAppState.currentUser!.walletAmount.toString()));
 
     String subjectNewString = emailTemplateModel.subject.toString();
     subjectNewString = subjectNewString.replaceAll("{orderid}", orderModel.id);
@@ -1937,8 +1679,7 @@ class FireStoreUtils {
         recipients: [MyAppState.currentUser!.email]);
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> watchOrderStatus(
-      String orderID) async* {
+  Stream<DocumentSnapshot<Map<String, dynamic>>> watchOrderStatus(String orderID) async* {
     yield* firestore.collection(ORDERS).doc(orderID).snapshots();
   }
 
@@ -1948,8 +1689,8 @@ class FireStoreUtils {
   /// @param file the image file that will be compressed
   /// @return File a new compressed file with smaller size
   static Future<File> compressImage(File file) async {
-    File compressedImage = await FlutterNativeImage.compressImage(file.path,
-        quality: 25, targetWidth: 600, targetHeight: 300);
+    File compressedImage =
+        await FlutterNativeImage.compressImage(file.path, quality: 25, targetWidth: 600, targetHeight: 300);
     return compressedImage;
   }
 
@@ -1960,10 +1701,7 @@ class FireStoreUtils {
   /// @return File a new compressed file with smaller size
   Future<File> _compressVideo(File file) async {
     MediaInfo? info = await VideoCompress.compressVideo(file.path,
-        quality: VideoQuality.DefaultQuality,
-        deleteOrigin: false,
-        includeAudio: true,
-        frameRate: 24);
+        quality: VideoQuality.DefaultQuality, deleteOrigin: false, includeAudio: true, frameRate: 24);
     if (info != null) {
       File compressedVideo = File(info.path!);
       return compressedVideo;
@@ -1979,32 +1717,22 @@ class FireStoreUtils {
     bool isLogged = await facebookAuth.accessToken != null;
     if (!isLogged) {
       LoginResult result = await facebookAuth.login(
-        permissions: [
-          'public_profile',
-          'email',
-          'pages_show_list',
-          'pages_messaging',
-          'pages_manage_metadata'
-        ],
+        permissions: ['public_profile', 'email', 'pages_show_list', 'pages_messaging', 'pages_manage_metadata'],
       ); // by default we request the email and the public profile
       if (result.status == LoginStatus.success) {
         // you are logged
         AccessToken? token = await facebookAuth.accessToken;
-        return await handleFacebookLogin(
-            await facebookAuth.getUserData(), token!);
+        return await handleFacebookLogin(await facebookAuth.getUserData(), token!);
       }
     } else {
       AccessToken? token = await facebookAuth.accessToken;
-      return await handleFacebookLogin(
-          await facebookAuth.getUserData(), token!);
+      return await handleFacebookLogin(await facebookAuth.getUserData(), token!);
     }
   }
 
-  static handleFacebookLogin(
-      Map<String, dynamic> userData, AccessToken token) async {
-    auth.UserCredential authResult = await auth.FirebaseAuth.instance
-        .signInWithCredential(
-            auth.FacebookAuthProvider.credential(token.token));
+  static handleFacebookLogin(Map<String, dynamic> userData, AccessToken token) async {
+    auth.UserCredential authResult =
+        await auth.FirebaseAuth.instance.signInWithCredential(auth.FacebookAuthProvider.credential(token.token));
     User? user = await getCurrentUser(authResult.user?.uid ?? ' ');
     List<String> fullName = (userData['name'] as String).split(' ');
     String firstName = '';
@@ -2048,20 +1776,16 @@ class FireStoreUtils {
 
   static loginWithApple() async {
     final appleCredential = await apple.TheAppleSignIn.performRequests([
-      apple.AppleIdRequest(
-          requestedScopes: [apple.Scope.email, apple.Scope.fullName])
+      apple.AppleIdRequest(requestedScopes: [apple.Scope.email, apple.Scope.fullName])
     ]);
     if (appleCredential.error != null) {
       return "notLoginApple".tr();
     }
 
     if (appleCredential.status == apple.AuthorizationStatus.authorized) {
-      final auth.AuthCredential credential =
-          auth.OAuthProvider('apple.com').credential(
-        accessToken: String.fromCharCodes(
-            appleCredential.credential?.authorizationCode ?? []),
-        idToken: String.fromCharCodes(
-            appleCredential.credential?.identityToken ?? []),
+      final auth.AuthCredential credential = auth.OAuthProvider('apple.com').credential(
+        accessToken: String.fromCharCodes(appleCredential.credential?.authorizationCode ?? []),
+        idToken: String.fromCharCodes(appleCredential.credential?.identityToken ?? []),
       );
       return await handleAppleLogin(credential, appleCredential.credential!);
     } else {
@@ -2073,8 +1797,7 @@ class FireStoreUtils {
     auth.AuthCredential credential,
     apple.AppleIdCredential appleIdCredential,
   ) async {
-    auth.UserCredential authResult =
-        await auth.FirebaseAuth.instance.signInWithCredential(credential);
+    auth.UserCredential authResult = await auth.FirebaseAuth.instance.signInWithCredential(credential);
     User? user = await getCurrentUser(authResult.user?.uid ?? '');
     if (user != null) {
       //user.active = true;
@@ -2107,29 +1830,22 @@ class FireStoreUtils {
 
   /// save a new user document in the USERS table in firebase firestore
   /// returns an error message on failure or null on success
-  static Future<String?> firebaseCreateNewUser(
-      User user, String referralCode) async {
+  static Future<String?> firebaseCreateNewUser(User user, String referralCode) async {
     try {
       if (referralCode.isNotEmpty) {
-        FireStoreUtils.getReferralUserByCode(referralCode.toString())
-            .then((value) async {
+        FireStoreUtils.getReferralUserByCode(referralCode.toString()).then((value) async {
           if (value != null) {
-            ReferralModel ownReferralModel = ReferralModel(
-                id: user.userID,
-                referralBy: value.id,
-                referralCode: getReferralCode());
+            ReferralModel ownReferralModel =
+                ReferralModel(id: user.userID, referralBy: value.id, referralCode: getReferralCode());
             await referralAdd(ownReferralModel);
           } else {
-            ReferralModel referralModel = ReferralModel(
-                id: user.userID,
-                referralBy: "",
-                referralCode: getReferralCode());
+            ReferralModel referralModel =
+                ReferralModel(id: user.userID, referralBy: "", referralCode: getReferralCode());
             await referralAdd(referralModel);
           }
         });
       } else {
-        ReferralModel referralModel = ReferralModel(
-            id: user.userID, referralBy: "", referralCode: getReferralCode());
+        ReferralModel referralModel = ReferralModel(id: user.userID, referralBy: "", referralCode: getReferralCode());
         await referralAdd(referralModel);
       }
 
@@ -2143,11 +1859,7 @@ class FireStoreUtils {
 
   static getReferralAmount() async {
     try {
-      await firestore
-          .collection(Setting)
-          .doc("referral_amount")
-          .get()
-          .then((value) {
+      await firestore.collection(Setting).doc("referral_amount").get().then((value) {
         referralAmount = value.data()!['referralAmount'];
       });
     } catch (e, s) {
@@ -2160,11 +1872,7 @@ class FireStoreUtils {
   static Future<bool?> checkReferralCodeValidOrNot(String referralCode) async {
     bool? isExit;
     try {
-      await firestore
-          .collection(REFERRAL)
-          .where("referralCode", isEqualTo: referralCode)
-          .get()
-          .then((value) {
+      await firestore.collection(REFERRAL).where("referralCode", isEqualTo: referralCode).get().then((value) {
         if (value.size > 0) {
           isExit = true;
         } else {
@@ -2178,15 +1886,10 @@ class FireStoreUtils {
     return isExit;
   }
 
-  static Future<ReferralModel?> getReferralUserByCode(
-      String referralCode) async {
+  static Future<ReferralModel?> getReferralUserByCode(String referralCode) async {
     ReferralModel? referralModel;
     try {
-      await firestore
-          .collection(REFERRAL)
-          .where("referralCode", isEqualTo: referralCode)
-          .get()
-          .then((value) {
+      await firestore.collection(REFERRAL).where("referralCode", isEqualTo: referralCode).get().then((value) {
         referralModel = ReferralModel.fromJson(value.docs.first.data());
       });
     } catch (e, s) {
@@ -2200,11 +1903,7 @@ class FireStoreUtils {
     ReferralModel? referralModel;
     try {
       print(MyAppState.currentUser!.userID);
-      await firestore
-          .collection(REFERRAL)
-          .doc(MyAppState.currentUser!.userID)
-          .get()
-          .then((value) {
+      await firestore.collection(REFERRAL).doc(MyAppState.currentUser!.userID).get().then((value) {
         referralModel = ReferralModel.fromJson(value.data()!);
       });
     } catch (e, s) {
@@ -2216,10 +1915,7 @@ class FireStoreUtils {
 
   static Future<String?> referralAdd(ReferralModel ratingModel) async {
     try {
-      await firestore
-          .collection(REFERRAL)
-          .doc(ratingModel.id)
-          .set(ratingModel.toJson());
+      await firestore.collection(REFERRAL).doc(ratingModel.id).set(ratingModel.toJson());
     } catch (e, s) {
       print('FireStoreUtils.firebaseCreateNewUser $e $s');
       return 'Couldn\'t review'.tr();
@@ -2227,13 +1923,9 @@ class FireStoreUtils {
     return null;
   }
 
-  static Future<String?> firebaseCreateNewReview(
-      RatingModel ratingModel) async {
+  static Future<String?> firebaseCreateNewReview(RatingModel ratingModel) async {
     try {
-      await firestore
-          .collection(Order_Rating)
-          .doc(ratingModel.id)
-          .set(ratingModel.toJson());
+      await firestore.collection(Order_Rating).doc(ratingModel.id).set(ratingModel.toJson());
     } catch (e, s) {
       print('FireStoreUtils.firebaseCreateNewUser $e $s');
       return 'Couldn\'t review'.tr();
@@ -2244,12 +1936,11 @@ class FireStoreUtils {
   /// login with email and password with firebase
   /// @param email user email
   /// @param password user password
-  static Future<dynamic> loginWithEmailAndPassword(
-      String email, String password) async {
+  static Future<dynamic> loginWithEmailAndPassword(String email, String password) async {
     try {
       print('FireStoreUtils.loginWithEmailAndPassword');
-      auth.UserCredential result = await auth.FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      auth.UserCredential result =
+          await auth.FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       // result.user.
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await firestore.collection(USERS).doc(result.user?.uid ?? '').get();
@@ -2309,16 +2000,12 @@ class FireStoreUtils {
 
   /// submit the received code to firebase to complete the phone number
   /// verification process
-  static Future<dynamic> firebaseSubmitPhoneNumberCode(String verificationID,
-      String code, String phoneNumber, BuildContext context,
-      {String firstName = 'Anonymous',
-      String lastName = 'User',
-      File? image,
-      String referralCode = ''}) async {
-    auth.AuthCredential authCredential = auth.PhoneAuthProvider.credential(
-        verificationId: verificationID, smsCode: code);
-    auth.UserCredential userCredential =
-        await auth.FirebaseAuth.instance.signInWithCredential(authCredential);
+  static Future<dynamic> firebaseSubmitPhoneNumberCode(
+      String verificationID, String code, String phoneNumber, BuildContext context,
+      {String firstName = 'Anonymous', String lastName = 'User', File? image, String referralCode = ''}) async {
+    auth.AuthCredential authCredential =
+        auth.PhoneAuthProvider.credential(verificationId: verificationID, smsCode: code);
+    auth.UserCredential userCredential = await auth.FirebaseAuth.instance.signInWithCredential(authCredential);
     User? user = await getCurrentUser(userCredential.user?.uid ?? '');
     if (user != null && user.role == USER_ROLE_CUSTOMER) {
       user.fcmToken = await firebaseMessaging.getToken() ?? '';
@@ -2340,8 +2027,7 @@ class FireStoreUtils {
           showAlertDialog(context, "error".tr(), "imageTooLarge".tr(), true);
           return;
         }
-        profileImageUrl = await uploadUserImageToFireStorage(
-            compressedImage, userCredential.user?.uid ?? '');
+        profileImageUrl = await uploadUserImageToFireStorage(compressedImage, userCredential.user?.uid ?? '');
       }
       User user = User(
         firstName: firstName,
@@ -2366,19 +2052,11 @@ class FireStoreUtils {
     }
   }
 
-  static firebaseSignUpWithEmailAndPassword(
-      String emailAddress,
-      String password,
-      File? image,
-      String firstName,
-      String lastName,
-      String mobile,
-      BuildContext context,
-      String referralCode) async {
+  static firebaseSignUpWithEmailAndPassword(String emailAddress, String password, File? image, String firstName,
+      String lastName, String mobile, BuildContext context, String referralCode) async {
     try {
-      auth.UserCredential result = await auth.FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailAddress, password: password);
+      auth.UserCredential result =
+          await auth.FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailAddress, password: password);
       String profilePicUrl = '';
       if (image != null) {
         File compressedImage = await FireStoreUtils.compressImage(image);
@@ -2392,8 +2070,7 @@ class FireStoreUtils {
           return;
         }
         updateProgress('Uploading image, Please wait...'.tr());
-        profilePicUrl = await uploadUserImageToFireStorage(
-            compressedImage, result.user?.uid ?? '');
+        profilePicUrl = await uploadUserImageToFireStorage(compressedImage, result.user?.uid ?? '');
       }
       User user = User(
           email: emailAddress,
@@ -2450,32 +2127,26 @@ class FireStoreUtils {
     late auth.AuthCredential credential;
     switch (provider) {
       case AuthProviders.PASSWORD:
-        credential = auth.EmailAuthProvider.credential(
-            email: email!, password: password!);
+        credential = auth.EmailAuthProvider.credential(email: email!, password: password!);
         break;
       case AuthProviders.PHONE:
-        credential = auth.PhoneAuthProvider.credential(
-            smsCode: smsCode!, verificationId: verificationId!);
+        credential = auth.PhoneAuthProvider.credential(smsCode: smsCode!, verificationId: verificationId!);
         break;
       case AuthProviders.FACEBOOK:
         credential = auth.FacebookAuthProvider.credential(accessToken!.token);
         break;
       case AuthProviders.APPLE:
         credential = auth.OAuthProvider('apple.com').credential(
-          accessToken: String.fromCharCodes(
-              appleCredential!.credential?.authorizationCode ?? []),
-          idToken: String.fromCharCodes(
-              appleCredential.credential?.identityToken ?? []),
+          accessToken: String.fromCharCodes(appleCredential!.credential?.authorizationCode ?? []),
+          idToken: String.fromCharCodes(appleCredential.credential?.identityToken ?? []),
         );
         break;
     }
-    return await auth.FirebaseAuth.instance.currentUser!
-        .reauthenticateWithCredential(credential);
+    return await auth.FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(credential);
   }
 
   static resetPassword(String emailAddress) async =>
-      await auth.FirebaseAuth.instance
-          .sendPasswordResetEmail(email: emailAddress);
+      await auth.FirebaseAuth.instance.sendPasswordResetEmail(email: emailAddress);
 
   static deleteUser() async {
     try {
@@ -2513,10 +2184,7 @@ class FireStoreUtils {
       });
 
       // delete user records from users table
-      await firestore
-          .collection(USERS)
-          .doc(auth.FirebaseAuth.instance.currentUser!.uid)
-          .delete();
+      await firestore.collection(USERS).doc(auth.FirebaseAuth.instance.currentUser!.uid).delete();
 
       // delete user  from firebase auth
       await auth.FirebaseAuth.instance.currentUser!.delete();
@@ -2528,23 +2196,16 @@ class FireStoreUtils {
   Future<List> getVendorCusions(String id) async {
     List tagList = [];
     List prodtagList = [];
-    QuerySnapshot<Map<String, dynamic>> productsQuery = await firestore
-        .collection(PRODUCTS)
-        .where('vendorID', isEqualTo: id)
-        .get();
-    await Future.forEach(productsQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
-      if (document.data().containsKey("categoryID") &&
-          document.data()['categoryID'].toString().isNotEmpty) {
+    QuerySnapshot<Map<String, dynamic>> productsQuery =
+        await firestore.collection(PRODUCTS).where('vendorID', isEqualTo: id).get();
+    await Future.forEach(productsQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+      if (document.data().containsKey("categoryID") && document.data()['categoryID'].toString().isNotEmpty) {
         prodtagList.add(document.data()['categoryID']);
       }
     });
-    QuerySnapshot<Map<String, dynamic>> catQuery = await firestore
-        .collection(VENDORS_CATEGORIES)
-        .where('publish', isEqualTo: true)
-        .get();
-    await Future.forEach(catQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> catQuery =
+        await firestore.collection(VENDORS_CATEGORIES).where('publish', isEqualTo: true).get();
+    await Future.forEach(catQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       Map<String, dynamic> catDoc = document.data();
       if (catDoc.containsKey("id") &&
           catDoc['id'].toString().isNotEmpty &&
@@ -2588,12 +2249,9 @@ class FireStoreUtils {
 
   static Future<List<GiftCardsModel>> getGiftCard() async {
     List<GiftCardsModel> giftCardModelList = [];
-    QuerySnapshot<Map<String, dynamic>> currencyQuery = await firestore
-        .collection(GIFT_CARDS)
-        .where("isEnable", isEqualTo: true)
-        .get();
-    await Future.forEach(currencyQuery.docs,
-        (QueryDocumentSnapshot<Map<String, dynamic>> document) {
+    QuerySnapshot<Map<String, dynamic>> currencyQuery =
+        await firestore.collection(GIFT_CARDS).where("isEnable", isEqualTo: true).get();
+    await Future.forEach(currencyQuery.docs, (QueryDocumentSnapshot<Map<String, dynamic>> document) {
       try {
         log(document.data().toString());
         giftCardModelList.add(GiftCardsModel.fromJson(document.data()));

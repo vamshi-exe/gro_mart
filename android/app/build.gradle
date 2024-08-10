@@ -6,6 +6,22 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+//secrets {
+//    // Optionally specify a different file name containing your secrets.
+//    // The plugin defaults to "local.properties"
+//    propertiesFileName = "secrets.properties"
+//
+//    // A properties file containing default secret values. This file can be
+//    // checked in version control.
+//    defaultPropertiesFileName = "local.defaults.properties"
+//
+//    // Configure which keys should be ignored by the plugin by providing regular expressions.
+//    // "sdk.dir" is ignored by default.
+//    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
+//    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+//}
+
+
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
     throw FileNotFoundException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
@@ -75,7 +91,8 @@ dependencies {
     implementation 'androidx.window:window:1.0.0'
     implementation 'androidx.window:window-java:1.0.0'
     implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:16.1.4'
-
+    implementation 'com.google.android.gms:play-services-maps:19.0.0'
 }
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'

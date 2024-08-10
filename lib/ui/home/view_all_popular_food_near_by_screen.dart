@@ -60,14 +60,16 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
   getFoodType() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
-      selctedOrderTypeValue = sp.getString("foodType") == "" || sp.getString("foodType") == null ? "Delivery".tr() : sp.getString("foodType");
+      selctedOrderTypeValue = sp.getString("foodType") == "" || sp.getString("foodType") == null
+          ? "Delivery".tr()
+          : sp.getString("foodType");
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppGlobal.buildAppBar(context, "Top Selling".tr()),
+      appBar: AppGlobal.buildAppBar(context, "Top Picks".tr()),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -101,7 +103,8 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
                               ? showEmptyState('No top selling found'.tr(), context)
                               : Container()
                           : buildVendorItemData(context, index, popularNearFoodVendorModel!);
-                    }),
+                    },
+                  ),
       ),
     );
   }
@@ -187,7 +190,8 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
                   lstNearByFood[index].disPrice == "" || lstNearByFood[index].disPrice == "0"
                       ? Text(
                           amountShow(amount: lstNearByFood[index].price),
-                          style: TextStyle(fontSize: 16, fontFamily: "Poppinsm", letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                          style: TextStyle(
+                              fontSize: 16, fontFamily: "Poppinsm", letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
                         )
                       : Row(
                           children: [
@@ -205,7 +209,11 @@ class _ViewAllPopularFoodNearByScreenState extends State<ViewAllPopularFoodNearB
                             ),
                             Text(
                               '${amountShow(amount: lstNearByFood[index].price)}',
-                              style: const TextStyle(fontFamily: "Poppinsm", fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                              style: const TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  decoration: TextDecoration.lineThrough),
                             ),
                           ],
                         ),

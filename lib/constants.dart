@@ -64,7 +64,7 @@ const MINUTE_MILLIS = 60 * SECOND_MILLIS;
 const HOUR_MILLIS = 60 * MINUTE_MILLIS;
 const SERVER_KEY =
     'AAAAqAfBB7E:APA91bHRB_1aLP1mrORB8ltODdytvKp_1MJzE2yuA7MwADaP-xREequHunsrJrNwdKOSyUp_El5HhGiZ8_SCv4HC4jGdLlcn_6j8anwYyBBFkZhrGm5HNRwDzABWG4TKUknDEwUdCr1w';
-String GOOGLE_API_KEY = '';
+String GOOGLE_API_KEY = 'AIzaSyB7QIERR7I0L4SXX8rsDpMf0KOlIc_Ueqw';
 
 const ORDER_STATUS_PLACED = 'Order Placed';
 const ORDER_STATUS_ACCEPTED = 'Order Accepted';
@@ -155,9 +155,7 @@ double calculateTax({String? amount, TaxModel? taxModel}) {
     if (taxModel.type == "fix") {
       taxAmount = double.parse(taxModel.tax.toString());
     } else {
-      taxAmount = (double.parse(amount.toString()) *
-              double.parse(taxModel.tax!.toString())) /
-          100;
+      taxAmount = (double.parse(amount.toString()) * double.parse(taxModel.tax!.toString())) / 100;
     }
   }
   return taxAmount;
@@ -166,11 +164,8 @@ double calculateTax({String? amount, TaxModel? taxModel}) {
 double calculateDiscount({String? amount, OfferModel? offerModel}) {
   double taxAmount = 0.0;
   if (offerModel != null) {
-    if (offerModel.discountType == "Percentage" ||
-        offerModel.discountType == "percentage") {
-      taxAmount = (double.parse(amount.toString()) *
-              double.parse(offerModel.discount.toString())) /
-          100;
+    if (offerModel.discountType == "Percentage" || offerModel.discountType == "percentage") {
+      taxAmount = (double.parse(amount.toString()) * double.parse(offerModel.discount.toString())) / 100;
     } else {
       taxAmount = double.parse(offerModel.discount.toString());
     }
@@ -181,8 +176,7 @@ double calculateDiscount({String? amount, OfferModel? offerModel}) {
 Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
   var uri;
   if (kIsWeb) {
-    uri = Uri.https('www.google.com', '/maps/search/',
-        {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
   } else if (Platform.isAndroid) {
     var query = '$latitude,$longitude';
     if (label != null) query += '($label)';
@@ -192,16 +186,14 @@ Uri createCoordinatesUrl(double latitude, double longitude, [String? label]) {
     if (label != null) params['q'] = label;
     uri = Uri.https('maps.apple.com', '/', params);
   } else {
-    uri = Uri.https('www.google.com', '/maps/search/',
-        {'api': '1', 'query': '$latitude,$longitude'});
+    uri = Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$latitude,$longitude'});
   }
 
   return uri;
 }
 
 String getKm(UserLocation pos1, UserLocation pos2) {
-  double distanceInMeters = Geolocator.distanceBetween(
-      pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
+  double distanceInMeters = Geolocator.distanceBetween(pos1.latitude, pos1.longitude, pos2.latitude, pos2.longitude);
   double kilometer = distanceInMeters / 1000;
   debugPrint("KiloMeter$kilometer");
   return kilometer.toStringAsFixed(2).toString();
@@ -238,18 +230,13 @@ final smtpServer = SmtpServer(mailSettings!.host.toString(),
     ssl: true,
     allowInsecure: true);
 
-sendMail(
-    {String? subject,
-    String? body,
-    bool? isAdmin = false,
-    List<dynamic>? recipients}) async {
+sendMail({String? subject, String? body, bool? isAdmin = false, List<dynamic>? recipients}) async {
   // Create our message.
   if (isAdmin == true) {
     recipients!.add(mailSettings!.userName.toString());
   }
   final message = Message()
-    ..from = Address(
-        mailSettings!.userName.toString(), mailSettings!.fromName.toString())
+    ..from = Address(mailSettings!.userName.toString(), mailSettings!.fromName.toString())
     ..recipients = recipients!
     ..subject = subject
     ..text = body

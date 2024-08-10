@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gromart_customer/main.dart';
 import 'package:gromart_customer/ui/auth/AuthScreen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,8 +12,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -36,7 +36,8 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
         CupertinoPageRoute(
-          builder: (context) => AuthScreen(),
+          builder: (context) => OnBoarding(),
+          // builder: (context) => AuthScreen(),
         ),
       );
     });

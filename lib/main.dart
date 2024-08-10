@@ -23,6 +23,7 @@ import 'package:gromart_customer/ui/container/ContainerScreen.dart';
 import 'package:gromart_customer/ui/location_permission_screen.dart';
 import 'package:gromart_customer/ui/navigation/navigation.dart';
 import 'package:gromart_customer/ui/onBoarding/OnBoardingScreen.dart';
+import 'package:gromart_customer/ui/splash/splashScreen.dart';
 import 'package:gromart_customer/userPrefrence.dart';
 import 'package:gromart_customer/utils/DarkThemeProvider.dart';
 import 'package:gromart_customer/utils/Styles.dart';
@@ -121,53 +122,30 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         originalOnError!(errorDetails);
         // Forward to original handler.
       };
-      await FirebaseFirestore.instance
-          .collection(Setting)
-          .doc("globalSettings")
-          .get()
-          .then((dineinresult) {
-        if (dineinresult.exists &&
-            dineinresult.data() != null &&
-            dineinresult.data()!.containsKey("website_color")) {
-          COLOR_PRIMARY = int.parse(
-              dineinresult.data()!["website_color"].replaceFirst("#", "0xff"));
+      await FirebaseFirestore.instance.collection(Setting).doc("globalSettings").get().then((dineinresult) {
+        if (dineinresult.exists && dineinresult.data() != null && dineinresult.data()!.containsKey("website_color")) {
+          COLOR_PRIMARY = int.parse(dineinresult.data()!["website_color"].replaceFirst("#", "0xff"));
         }
       });
 
-      await FirebaseFirestore.instance
-          .collection(Setting)
-          .doc("DineinForRestaurant")
-          .get()
-          .then((dineinresult) {
+      await FirebaseFirestore.instance.collection(Setting).doc("DineinForRestaurant").get().then((dineinresult) {
         if (dineinresult.exists) {
           isDineInEnable = dineinresult.data()!["isEnabledForCustomer"];
         }
       });
 
-      await FirebaseFirestore.instance
-          .collection(Setting)
-          .doc("emailSetting")
-          .get()
-          .then((value) {
+      await FirebaseFirestore.instance.collection(Setting).doc("emailSetting").get().then((value) {
         if (value.exists) {
           mailSettings = MailSettings.fromJson(value.data()!);
         }
       });
 
-      await FirebaseFirestore.instance
-          .collection(Setting)
-          .doc("Version")
-          .get()
-          .then((value) {
+      await FirebaseFirestore.instance.collection(Setting).doc("Version").get().then((value) {
         debugPrint(value.data().toString());
         appVersion = value.data()!['app_version'].toString();
       });
 
-      await FirebaseFirestore.instance
-          .collection(Setting)
-          .doc("googleMapKey")
-          .get()
-          .then((value) {
+      await FirebaseFirestore.instance.collection(Setting).doc("googleMapKey").get().then((value) {
         print(value.data());
         GOOGLE_API_KEY = value.data()!['key'].toString();
       });
@@ -195,7 +173,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 themeChangeProvider.darkTheme,
                 context,
               ),
-              home: OnBoarding());
+              home: SplashScreen());
         },
       ),
     );
@@ -242,22 +220,16 @@ class OnBoardingState extends State<OnBoarding> {
             if (user.active) {
               user.active = true;
               user.role = USER_ROLE_CUSTOMER;
-              user.fcmToken =
-                  await FireStoreUtils.firebaseMessaging.getToken() ?? '';
+              user.fcmToken = await FireStoreUtils.firebaseMessaging.getToken() ?? '';
               await FireStoreUtils.updateCurrentUser(user);
               MyAppState.currentUser = user;
               if (MyAppState.currentUser!.shippingAddress != null &&
                   MyAppState.currentUser!.shippingAddress!.isNotEmpty) {
-                if (MyAppState.currentUser!.shippingAddress!
-                    .where((element) => element.isDefault == true)
-                    .isNotEmpty) {
-                  MyAppState.selectedPosotion = MyAppState
-                      .currentUser!.shippingAddress!
-                      .where((element) => element.isDefault == true)
-                      .single;
-                } else {
+                if (MyAppState.currentUser!.shippingAddress!.where((element) => element.isDefault == true).isNotEmpty) {
                   MyAppState.selectedPosotion =
-                      MyAppState.currentUser!.shippingAddress!.first;
+                      MyAppState.currentUser!.shippingAddress!.where((element) => element.isDefault == true).single;
+                } else {
+                  MyAppState.selectedPosotion = MyAppState.currentUser!.shippingAddress!.first;
                 }
                 pushReplacement(context, NavigationController(user: user));
               } else {
@@ -269,8 +241,7 @@ class OnBoardingState extends State<OnBoarding> {
               await FireStoreUtils.updateCurrentUser(user);
               await auth.FirebaseAuth.instance.signOut();
               MyAppState.currentUser = null;
-              Provider.of<CartDatabase>(context, listen: false)
-                  .deleteAllProducts();
+              Provider.of<CartDatabase>(context, listen: false).deleteAllProducts();
               pushAndRemoveUntil(context, AuthScreen(), false);
             }
           } else {

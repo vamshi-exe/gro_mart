@@ -7,6 +7,7 @@ import 'package:gromart_customer/model/ProductModel.dart';
 import 'package:gromart_customer/model/VendorModel.dart';
 import 'package:gromart_customer/services/FirebaseHelper.dart';
 import 'package:gromart_customer/services/helper.dart';
+import 'package:gromart_customer/ui/categoryDetailsScreen/CategoryDetailsScreen.dart';
 import 'package:gromart_customer/ui/productDetailsScreen/ProductDetailsScreen.dart';
 import 'package:gromart_customer/ui/vendorProductsScreen/newVendorProductsScreen.dart';
 
@@ -66,7 +67,9 @@ class SearchScreenState extends State<SearchScreen> {
                       hintText: 'Search menu, store or etc...'.tr(),
                       contentPadding: const EdgeInsets.only(left: 10, right: 10, top: 10),
                       hintStyle: const TextStyle(color: Color(0XFF8A8989), fontFamily: 'Poppinsr'),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
                         borderRadius: BorderRadius.circular(10.0),
@@ -185,10 +188,16 @@ class SearchScreenState extends State<SearchScreen> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => push(
-          context,
-          NewVendorProductsScreen(
-            vendorModel: vendorModel,
-          )),
+        context,
+        // CategoryDetailsScreen(
+        //   index: 0,
+        //   vendorModel: vendorModel,
+        //   title: '',
+        // ),
+        NewVendorProductsScreen(
+          vendorModel: vendorModel,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 4,
@@ -328,7 +337,11 @@ class SearchScreenState extends State<SearchScreen> {
                       productModel.disPrice == "" || productModel.disPrice == "0"
                           ? Text(
                               "${amountShow(amount: productModel.price.toString())}",
-                              style: TextStyle(fontFamily: "Poppinsm", fontWeight: FontWeight.w600, letterSpacing: 0.5, color: Color(COLOR_PRIMARY)),
+                              style: TextStyle(
+                                  fontFamily: "Poppinsm",
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                  color: Color(COLOR_PRIMARY)),
                             )
                           : Row(
                               children: [
@@ -346,7 +359,11 @@ class SearchScreenState extends State<SearchScreen> {
                                 ),
                                 Text(
                                   "${amountShow(amount: productModel.price.toString())}",
-                                  style: const TextStyle(fontFamily: "Poppinsm", fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                                  style: const TextStyle(
+                                      fontFamily: "Poppinsm",
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.lineThrough),
                                 ),
                               ],
                             ),

@@ -304,6 +304,7 @@ import 'package:gromart_customer/services/helper.dart';
 import 'package:gromart_customer/ui/accountDetails/AccountDetailsScreen.dart';
 import 'package:gromart_customer/ui/auth/AuthScreen.dart';
 import 'package:gromart_customer/ui/dineInScreen/my_booking_screen.dart';
+import 'package:gromart_customer/ui/login/LoginScreen.dart';
 import 'package:gromart_customer/ui/ordersScreen/OrdersScreen.dart';
 import 'package:gromart_customer/ui/privacy_policy/privacy_policy.dart';
 import 'package:gromart_customer/ui/termsAndCondition/terms_and_codition.dart';
@@ -343,8 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Container(
                 color: Colors.green,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(top: 40.0, bottom: 20, left: 20),
+                  padding: const EdgeInsets.only(top: 40.0, bottom: 20, left: 20),
                   child: Column(
                     children: [
                       Center(
@@ -365,8 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: <Widget>[
                               CircleAvatar(
                                 radius: 40,
-                                backgroundImage:
-                                    NetworkImage(user.profilePictureURL),
+                                backgroundImage: NetworkImage(user.profilePictureURL),
                               ),
                               Positioned(
                                 child: Container(
@@ -377,9 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Icon(
                                       Icons.camera_alt,
                                       size: 18,
-                                      color: isDarkMode(context)
-                                          ? Colors.black
-                                          : Colors.white,
+                                      color: isDarkMode(context) ? Colors.black : Colors.white,
                                     ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -462,7 +459,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('My Orders'),
               onTap: () {
                 // Functionality to view orders
-                push(context, OrdersScreen());
+                // push(context, OrdersScreen());
+                push(context, MyBookingScreen());
               },
               trailing: Icon(Icons.arrow_forward_ios_rounded),
             ),
@@ -476,6 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 push(context, PrivacyPolicyScreen());
               },
+              //tri.pathi.gaurav888@gmail.com
               trailing: Icon(Icons.arrow_forward_ios_rounded),
             ),
             Padding(
@@ -498,22 +497,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.green,
                     padding: EdgeInsets.only(top: 12, bottom: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                   ),
                   child: Text(
                     'Logout',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   onPressed: () async {
                     user.lastOnlineTimestamp = Timestamp.now();
                     await FireStoreUtils.updateCurrentUser(user);
                     await auth.FirebaseAuth.instance.signOut();
                     MyAppState.currentUser = null;
-                    pushAndRemoveUntil(context, AuthScreen(), false);
+                    pushAndRemoveUntil(context, LoginScreen(), false);
                   },
                 ),
               ),
@@ -548,8 +543,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text("Choose from gallery").tr(),
           onPressed: () async {
             Navigator.pop(context);
-            XFile? image =
-                await _imagePicker.pickImage(source: ImageSource.gallery);
+            XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
             if (image != null) {
               await _imagePicked(File(image.path));
             }
@@ -560,8 +554,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text("Take a picture").tr(),
           onPressed: () async {
             Navigator.pop(context);
-            XFile? image =
-                await _imagePicker.pickImage(source: ImageSource.camera);
+            XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
             if (image != null) {
               await _imagePicked(File(image.path));
             }
@@ -588,12 +581,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (mb > 2) {
       hideProgress();
-      showAlertDialog(context, "error".tr(),
-          "Select an image that is less than 2MB".tr(), true);
+      showAlertDialog(context, "error".tr(), "Select an image that is less than 2MB".tr(), true);
       return;
     }
-    user.profilePictureURL = await FireStoreUtils.uploadUserImageToFireStorage(
-        compressedImage, user.userID);
+    user.profilePictureURL = await FireStoreUtils.uploadUserImageToFireStorage(compressedImage, user.userID);
     await FireStoreUtils.updateCurrentUser(user);
     MyAppState.currentUser = user;
     hideProgress();
