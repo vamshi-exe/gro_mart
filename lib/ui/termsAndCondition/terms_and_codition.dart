@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:gromart_customer/AppGlobal.dart';
 import 'package:gromart_customer/constants.dart';
 
 class TermsAndCondition extends StatefulWidget {
@@ -28,29 +29,22 @@ class _TermsAndConditionState extends State<TermsAndCondition> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(
-            Icons.arrow_back,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: termsAndCondition != null
-              ? HtmlWidget(
-                  // the first parameter (`html`) is required
-                  '''
+      appBar: AppGlobal.buildSimpleAppBar(context, 'Terms & Conditions', isCenter: true),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: termsAndCondition != null
+                ? HtmlWidget(
+                    // the first parameter (`html`) is required
+                    '''
                   $termsAndCondition
-                   ''',
-                  onErrorBuilder: (context, element, error) => Text('$element ${"error:".tr()} $error'),
-                  onLoadingBuilder: (context, element, loadingProgress) => const CircularProgressIndicator(),
-                )
-              : const Center(child: CircularProgressIndicator()),
+                     ''',
+                    onErrorBuilder: (context, element, error) => Text('$element ${"error:".tr()} $error'),
+                    onLoadingBuilder: (context, element, loadingProgress) => const CircularProgressIndicator(),
+                  )
+                : const Center(child: CircularProgressIndicator()),
+          ),
         ),
       ),
     );

@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final fireStoreUtils = FireStoreUtils();
 
   late Future<List<ProductModel>> productsFuture;
-  final PageController _controller = PageController(viewportFraction: 0.8, keepPage: true);
+  final PageController _controller = PageController(viewportFraction: 1, keepPage: true);
   List<VendorModel> vendors = [];
   List<VendorModel> popularRestaurantLst = [];
   List<VendorModel> newArrivalLst = [];
@@ -507,21 +507,28 @@ class _HomeScreenState extends State<HomeScreen> {
                               Visibility(
                                 visible: bannerTopHome.isNotEmpty,
                                 child: Container(
+                                  width: double.infinity,
                                   color: isDarkMode(context) ? const Color(DARK_COLOR) : const Color(0xffFFFFFF),
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: isHomeBannerLoading
                                       ? const Center(child: CircularProgressIndicator())
                                       : SizedBox(
                                           height: MediaQuery.of(context).size.height * 0.23,
+                                          width: MediaQuery.of(context).size.width,
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 10),
                                             child: PageView.builder(
-                                                padEnds: false,
-                                                itemCount: bannerTopHome.length,
-                                                scrollDirection: Axis.horizontal,
-                                                controller: _controller,
-                                                itemBuilder: (context, index) =>
-                                                    buildBestDealPage(bannerTopHome[index])),
+                                              padEnds: false,
+                                              itemCount: bannerTopHome.length,
+                                              scrollDirection: Axis.horizontal,
+                                              controller: _controller,
+                                              itemBuilder: (context, index) {
+                                                print("length is: ${bannerTopHome.length}");
+                                                return buildBestDealPage(
+                                                  bannerTopHome[index],
+                                                );
+                                              },
+                                            ),
                                           ),
                                         ),
                                 ),
@@ -654,16 +661,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? const Center(child: CircularProgressIndicator())
                                       : SizedBox(
                                           height: MediaQuery.of(context).size.height * 0.23,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                                            child: PageView.builder(
-                                              padEnds: false,
-                                              itemCount: bannerMiddleHome.length,
-                                              scrollDirection: Axis.horizontal,
-                                              controller: _controller,
-                                              itemBuilder: (context, index) => buildBestDealPage(
-                                                bannerMiddleHome[index],
-                                              ),
+                                          // width: MediaQuery.of(context).size.width * 0.9,
+                                          child: PageView.builder(
+                                            padEnds: false,
+                                            itemCount: bannerMiddleHome.length,
+                                            scrollDirection: Axis.horizontal,
+                                            controller: _controller,
+                                            itemBuilder: (context, index) => buildBestDealPage(
+                                              bannerMiddleHome[index],
                                             ),
                                           ),
                                         ),
@@ -1386,7 +1391,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Color(COLOR_ACCENT)),
-                          onPressed: () {},
+                          onPressed: () async {
+                            await Navigator.of(context)
+                                .push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetailsScreen(
+                                      productModel: product,
+                                      vendorModel: VendorModel(),
+                                    ),
+                                  ),
+                                )
+                                .whenComplete(() => setState(() {}));
+                          },
                           child: Text(
                             'Add',
                             style: TextStyle(color: AppColors.WHITE_COLOR),
@@ -1701,12 +1717,17 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Container(
+          width: MediaQuery.of(context).size.width,
           child: CachedNetworkImage(
+            // width: MediaQuery.of(context).size.width,
             imageUrl: getImageVAlidUrl(categoriesModel.photo.toString()),
             imageBuilder: (context, imageProvider) => Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             color: Colors.black.withOpacity(0.5),

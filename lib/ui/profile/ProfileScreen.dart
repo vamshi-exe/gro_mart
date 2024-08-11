@@ -308,7 +308,9 @@ import 'package:gromart_customer/ui/login/LoginScreen.dart';
 import 'package:gromart_customer/ui/ordersScreen/OrdersScreen.dart';
 import 'package:gromart_customer/ui/privacy_policy/privacy_policy.dart';
 import 'package:gromart_customer/ui/termsAndCondition/terms_and_codition.dart';
+import 'package:gromart_customer/utils/DarkThemeProvider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -331,6 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
+    print("profile pic: ${user.profilePictureURL}");
     return Scaffold(
       backgroundColor: isDarkMode(context) ? Color(DARK_COLOR) : null,
       body: SingleChildScrollView(
@@ -343,74 +347,108 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Container(
                 color: Colors.green,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0, bottom: 20, left: 20),
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Text(
-                          'My Profile',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20, left: 20),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Text(
+                            'My Profile',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Stack(
-                            alignment: Alignment.bottomRight,
-                            children: <Widget>[
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundImage: NetworkImage(user.profilePictureURL),
-                              ),
-                              Positioned(
-                                child: Container(
-                                  width: 30,
-                                  height: 30,
-                                  child: FloatingActionButton(
-                                    backgroundColor: Color(COLOR_ACCENT),
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      size: 18,
-                                      color: isDarkMode(context) ? Colors.black : Colors.white,
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: <Widget>[
+                                    user.profilePictureURL.isEmpty
+                                        ? CircleAvatar(
+                                            backgroundColor: Colors.white,
+                                            radius: 40,
+                                            backgroundImage: AssetImage('assets/images/pngwing.png'),
+                                          )
+                                        : CircleAvatar(
+                                            backgroundColor: Colors.white,
+                                            radius: 40,
+                                            backgroundImage: NetworkImage(user.profilePictureURL),
+                                          ),
+                                    Positioned(
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        child: FloatingActionButton(
+                                          backgroundColor: Color(COLOR_ACCENT),
+                                          child: Icon(
+                                            Icons.camera_alt,
+                                            size: 18,
+                                            color: isDarkMode(context) ? Colors.black : Colors.white,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          onPressed: _onCameraClick,
+                                        ),
+                                      ),
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                  ],
+                                ),
+                                SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.fullName(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    onPressed: _onCameraClick,
+                                    Text(
+                                      user.email,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                !themeChange.darkTheme
+                                    ? const Icon(Icons.light_mode_sharp)
+                                    : const Icon(Icons.nightlight),
+                                Transform.scale(
+                                  scale: 0.8,
+                                  child: CupertinoSwitch(
+                                    // thumb color (round icon)
+                                    // splashRadius: 50.0,
+                                    // activeThumbImage: const AssetImage('https://lists.gnu.org/archive/html/emacs-devel/2015-10/pngR9b4lzUy39.png'),
+                                    // inactiveThumbImage: const AssetImage('http://wolfrosch.com/_img/works/goodies/icon/vim@2x'),
+
+                                    value: themeChange.darkTheme,
+                                    trackColor: Colors.white,
+                                    onChanged: (value) => setState(() => themeChange.darkTheme = value),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                user.fullName(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                user.email,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -430,26 +468,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Divider(),
             ),
-            ListTile(
-              leading: Icon(Icons.lock),
-              title: Text('Change Password'),
-              onTap: () {
-                // Functionality to change password
-              },
-              trailing: Icon(Icons.arrow_forward_ios_rounded),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Divider(),
-            ),
-            ListTile(
-              leading: Icon(Icons.payment),
-              title: Text('Payment Method'),
-              onTap: () {
-                // Functionality to manage payment method
-              },
-              trailing: Icon(Icons.arrow_forward_ios_rounded),
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.lock),
+            //   title: Text('Change Password'),
+            //   onTap: () {
+            //     // Functionality to change password
+            //   },
+            //   trailing: Icon(Icons.arrow_forward_ios_rounded),
+            // ),
+
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            //   child: Divider(),
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.payment),
+            //   title: Text('Payment Method'),
+            //   onTap: () {
+            //     // Functionality to manage payment method
+            //   },
+            //   trailing: Icon(Icons.arrow_forward_ios_rounded),
+            // ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Divider(),

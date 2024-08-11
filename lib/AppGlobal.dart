@@ -28,7 +28,10 @@ class AppGlobal {
       ),
       title: Text(
         title,
-        style: TextStyle(fontFamily: "Poppinsm", color: isDarkMode(context) ? Colors.white : Colors.black, fontWeight: FontWeight.normal),
+        style: TextStyle(
+            fontFamily: "Poppinsm",
+            color: isDarkMode(context) ? Colors.white : Colors.black,
+            fontWeight: FontWeight.normal),
       ),
       actions: [
         IconButton(
@@ -82,9 +85,9 @@ class AppGlobal {
     );
   }
 
-  static AppBar buildSimpleAppBar(BuildContext context, String title) {
+  static AppBar buildSimpleAppBar(BuildContext context, String title, {bool? isCenter}) {
     return AppBar(
-      centerTitle: false,
+      centerTitle: isCenter ?? false,
       elevation: 0,
       leading: GestureDetector(
         onTap: () {
@@ -95,7 +98,9 @@ class AppGlobal {
           color: Color(COLOR_PRIMARY),
         ),
       ),
-      title: Text(title, style: TextStyle(fontFamily: 'Poppinssb', color: isDarkMode(context) ? Colors.white : Colors.black)).tr(),
+      title: Text(title,
+              style: TextStyle(fontFamily: 'Poppinssb', color: isDarkMode(context) ? Colors.white : Colors.black))
+          .tr(),
     );
   }
 }

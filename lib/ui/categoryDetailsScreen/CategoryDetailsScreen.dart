@@ -462,12 +462,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/src/public_ext.dart';
 import 'package:flutter/material.dart';
+import 'package:gromart_customer/main.dart';
+import 'package:gromart_customer/model/FavouriteItemModel.dart';
 import 'package:gromart_customer/model/ProductModel.dart';
 import 'package:gromart_customer/model/VendorCategoryModel.dart';
 import 'package:gromart_customer/model/VendorModel.dart';
 import 'package:gromart_customer/model/offer_model.dart';
 import 'package:gromart_customer/services/FirebaseHelper.dart';
 import 'package:gromart_customer/services/helper.dart';
+import 'package:gromart_customer/ui/auth/AuthScreen.dart';
 import 'package:gromart_customer/ui/productDetailsScreen/ProductDetailsScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -501,6 +504,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   int totItem = 0;
   int? selectedIndex;
   String? selectedCategory;
+  List<FavouriteItemModel> lstFav = [];
 
   @override
   void initState() {
@@ -598,7 +602,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 242, 242, 242),
-      appBar: AppGlobal.buildAppBar(context, widget.title),
+      appBar: AppGlobal.buildAppBar(context, selectedCategory!),
       body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -747,108 +751,163 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
+          child: Stack(
             children: [
-              CachedNetworkImage(
-                imageUrl: getImageVAlidUrl(lstNearByFood[index].photo),
-                height: 100,
-                width: 100,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                placeholder: (context, url) => Center(
-                    child: CircularProgressIndicator.adaptive(
-                  valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
-                )),
-                errorWidget: (context, url, error) => ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(
-                      AppGlobal.placeHolderImage!,
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                    )),
-                fit: BoxFit.cover,
-              ),
-              // const SizedBox(
-              //   width: 10,
-              // ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lstNearByFood[index].name,
-                      style: const TextStyle(
-                        fontFamily: "Poppinsm",
-                        fontSize: 18,
-                        color: Color(0xff000000),
+              Column(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: getImageVAlidUrl(lstNearByFood[index].photo),
+                    height: 100,
+                    width: 100,
+                    imageBuilder: (context, imageProvider) => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
                       ),
-                      maxLines: 1,
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator.adaptive(
+                      valueColor: AlwaysStoppedAnimation(Color(COLOR_PRIMARY)),
+                    )),
+                    errorWidget: (context, url, error) => ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.network(
+                          AppGlobal.placeHolderImage!,
+                          fit: BoxFit.cover,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                        )),
+                    fit: BoxFit.cover,
+                  ),
+                  // const SizedBox(
+                  //   width: 10,
+                  // ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        lstNearByFood[index].disPrice == "" || lstNearByFood[index].disPrice == "0"
-                            ? Text(
-                                amountShow(amount: lstNearByFood[index].price),
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: "Poppinsm",
-                                    letterSpacing: 0.5,
-                                    color: Color(COLOR_PRIMARY)),
-                              )
-                            : Column(
-                                children: [
-                                  Text(
-                                    "${amountShow(amount: lstNearByFood[index].disPrice)}",
-                                    style: TextStyle(
-                                      fontFamily: "Poppinsm",
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(COLOR_PRIMARY),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    '${amountShow(amount: lstNearByFood[index].price)}',
-                                    style: const TextStyle(
-                                        fontFamily: "Poppinsm",
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey,
-                                        decoration: TextDecoration.lineThrough),
-                                  ),
-                                ],
-                              ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await Navigator.of(context)
-                                .push(MaterialPageRoute(
-                                    builder: (context) => ProductDetailsScreen(
-                                        productModel: productModel, vendorModel: widget.vendorModel)))
-                                .whenComplete(() => setState(() {}));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(COLOR_ACCENT),
+                        Text(
+                          lstNearByFood[index].name,
+                          style: const TextStyle(
+                            fontFamily: "Poppinsm",
+                            fontSize: 18,
+                            color: Color(0xff000000),
                           ),
-                          child: Text(
-                            'ADD'.tr(),
-                            style: TextStyle(fontFamily: "Poppinsm", color: AppColors.WHITE_COLOR),
-                          ),
+                          maxLines: 1,
                         ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            lstNearByFood[index].disPrice == "" || lstNearByFood[index].disPrice == "0"
+                                ? Text(
+                                    amountShow(amount: lstNearByFood[index].price),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: "Poppinsm",
+                                        letterSpacing: 0.5,
+                                        color: Color(COLOR_PRIMARY)),
+                                  )
+                                : Column(
+                                    children: [
+                                      Text(
+                                        "${amountShow(amount: lstNearByFood[index].disPrice)}",
+                                        style: TextStyle(
+                                          fontFamily: "Poppinsm",
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(COLOR_PRIMARY),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        '${amountShow(amount: lstNearByFood[index].price)}',
+                                        style: const TextStyle(
+                                            fontFamily: "Poppinsm",
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey,
+                                            decoration: TextDecoration.lineThrough),
+                                      ),
+                                    ],
+                                  ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                await Navigator.of(context)
+                                    .push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetailsScreen(
+                                          productModel: productModel,
+                                          vendorModel: widget.vendorModel,
+                                        ),
+                                      ),
+                                    )
+                                    .whenComplete(() => setState(() {}));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(COLOR_ACCENT),
+                              ),
+                              child: Text(
+                                'ADD'.tr(),
+                                style: TextStyle(fontFamily: "Poppinsm", color: AppColors.WHITE_COLOR),
+                              ),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
+                    ),
+                  )
+                ],
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () {
+                    if (MyAppState.currentUser == null) {
+                      push(context, AuthScreen());
+                    } else {
+                      setState(() {
+                        var contain = lstFav.where((element) => element.productId == productModel.id);
+
+                        if (contain.isNotEmpty) {
+                          FavouriteItemModel favouriteModel = FavouriteItemModel(
+                              productId: productModel.id,
+                              storeId: widget.vendorModel.id,
+                              userId: MyAppState.currentUser!.userID);
+                          lstFav.removeWhere((item) => item.productId == productModel.id);
+                          FireStoreUtils().removeFavouriteItem(favouriteModel);
+                        } else {
+                          FavouriteItemModel favouriteModel = FavouriteItemModel(
+                              productId: productModel.id,
+                              storeId: widget.vendorModel.id,
+                              userId: MyAppState.currentUser!.userID);
+                          FireStoreUtils().setFavouriteStoreItem(favouriteModel);
+                          lstFav.add(favouriteModel);
+                        }
+                      });
+                    }
+                  },
+                  child: lstFav.where((element) => element.productId == productModel.id).isNotEmpty
+                      ? Icon(
+                          Icons.favorite,
+                          color: Color(COLOR_PRIMARY),
+                        )
+                      : Icon(
+                          Icons.favorite_border,
+                          color: isDarkMode(context) ? Colors.white38 : Colors.black38,
+                        ),
                 ),
-              )
+              ),
+              // Align(
+              //   alignment: Alignment.topRight,
+              //   child: Icon(
+              //     Icons.favorite,
+              //     color: Color(COLOR_PRIMARY),
+              //   ),
+              // ),
             ],
           ),
         ),
